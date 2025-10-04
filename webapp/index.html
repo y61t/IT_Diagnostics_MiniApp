@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Диагностика IT-рисков</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Подключаем Telegram Web App JS -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 </head>
 <body>
   <!-- Экран 1 -->
@@ -41,7 +43,8 @@
     <form id="contact-form">
       <input type="text" name="name" placeholder="Имя" required>
       <input type="email" name="email" placeholder="Email" required>
-      <input type="text" name="telegram" placeholder="Telegram / Телефон">
+      <!-- Скрытое поле Telegram, chat_id берётся автоматически -->
+      <input type="hidden" name="telegram" id="telegram-id">
       <button type="submit" class="primary">📩 Получить чек-лист</button>
     </form>
 
