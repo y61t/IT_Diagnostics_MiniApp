@@ -5,6 +5,10 @@ from aiogram.filters import Command
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
 
 # 🔹 Твой токен
 TOKEN = os.getenv("TELEGRAM_TOKEN")

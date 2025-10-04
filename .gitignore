@@ -3,4 +3,4 @@ __pycache__/
 .venv/
 .env
 .idea/
-webapp/pdfs/*.pdf
+webapp/pdf/*.pdf
