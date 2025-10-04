@@ -6,11 +6,38 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="container">
+  <div class="container" id="screen1">
     <h1>Ваш ИТ-проект может стоить в 2 раза дороже 💸</h1>
     <p>Узнайте, где ваши деньги сгорят. Пройдите мини-диагностику.</p>
-    <button id="start">Начать диагностику</button>
+    <div id="scenario-buttons">
+      <button data-scenario="1">Проект уже трещит по швам</button>
+      <button data-scenario="2">Готовлю запуск ИТ-проекта</button>
+      <button data-scenario="3">Опасаюсь импортозамещения и стратегии</button>
+      <button data-scenario="4">Хочу проверить подрядчика и команду</button>
+      <button data-scenario="5">Не уверен в цифровой зрелости бизнеса</button>
+      <button data-scenario="6">Я CFO, хочу проверить бюджет проекта</button>
+    </div>
   </div>
+
+  <div class="container" id="screen2" style="display:none;">
+    <h2>Инсайт</h2>
+    <p id="insight-text"></p>
+    <button id="next-contact">Продолжить</button>
+  </div>
+
+  <div class="container" id="screen3" style="display:none;">
+    <h2>Получите чек-лист и рекомендации</h2>
+    <p>Введите ваши данные, чтобы получить персонализированный чек-лист:</p>
+    <form id="contact-form">
+      <input type="text" name="name" placeholder="Имя" required><br><br>
+      <input type="email" name="email" placeholder="Email" required><br><br>
+      <input type="text" name="telegram" placeholder="Telegram / Телефон"><br><br>
+      <button type="submit">Получить чек-лист</button>
+    </form>
+    <p id="form-message" style="color: green; font-weight: bold;"></p>
+  </div>
+
+
 
   <script src="script.js"></script>
 </body>
