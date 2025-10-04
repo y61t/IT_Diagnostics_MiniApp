@@ -8,19 +8,6 @@ const formMessage = document.getElementById("form-message");
 
 let selectedScenario = null;
 
-// Проверка Telegram Web App
-let telegram_id = null;
-if (window.Telegram?.WebApp) {
-    Telegram.WebApp.ready();
-    telegram_id = Telegram.WebApp.initDataUnsafe?.user?.id;
-    console.log("✅ Telegram WebApp доступен:", Telegram.WebApp.initDataUnsafe);
-    if (!telegram_id) {
-        console.error("⚠️ Не удалось получить chat_id пользователя.");
-    }
-} else {
-    console.error("⚠️ Telegram WebApp не найден! Откройте страницу через Telegram.");
-}
-
 // Тексты инсайтов и чек-листов
 const insights = {
   1: {
@@ -80,9 +67,17 @@ const insights = {
 };
 
 // Валидация email и имени
-function validateEmail(email) { return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email); }
-function validateName(name) { return /^[А-Яа-яA-Za-zЁё\s-]+$/.test(name); }
-function validateNameLength(name) { return name.length >= 2; }
+function validateEmail(email) {
+  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+}
+
+function validateName(name) {
+  return /^[А-Яа-яA-Za-zЁё\s-]+$/.test(name);
+}
+
+function validateNameLength(name) {
+  return name.length >= 2;
+}
 
 // Сообщения
 function showError(message, field = null) {
@@ -91,11 +86,13 @@ function showError(message, field = null) {
   formMessage.style.display = "block";
   if (field) field.classList.add("error");
 }
+
 function clearError(field = null) {
   formMessage.innerText = "";
   formMessage.style.display = "none";
   if (field) field.classList.remove("error");
 }
+
 function showSuccess(message) {
   formMessage.innerText = message;
   formMessage.style.color = "green";
@@ -123,19 +120,16 @@ document.getElementById("next-contact").addEventListener("click", () => {
 contactForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  if (!telegram_id) {
-      showError("Не удалось получить ваш Telegram. Откройте через Telegram Web App.");
-      return;
-  }
-
   const nameField = contactForm.querySelector("input[name='name']");
   const emailField = contactForm.querySelector("input[name='email']");
+  const telegramField = contactForm.querySelector("input[name='telegram']");
 
   clearError(nameField);
   clearError(emailField);
 
   const name = nameField.value.trim();
   const email = emailField.value.trim();
+  const telegram = telegramField.value.trim();
 
   if (!name) return showError("Введите имя.", nameField);
   if (!validateName(name)) return showError("Имя должно содержать только буквы, пробелы или дефисы.", nameField);
@@ -143,7 +137,7 @@ contactForm.addEventListener("submit", async (e) => {
   if (!email) return showError("Введите email.", emailField);
   if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
 
-  const data = { name, email, scenario: selectedScenario, telegram: telegram_id };
+  const data = { name, email, telegram, scenario: selectedScenario };
 
   try {
     const response = await fetch("/submit", {
@@ -155,12 +149,17 @@ contactForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (response.ok && result.status === "ok") {
-      showSuccess("Спасибо! Чек-лист уже отправлен вам в Telegram. Наш архитектор также пришлёт дорожную карту и рекомендации.");
+      showSuccess("Спасибо! Чек-лист уже летит к вам. Наш архитектор также пришлёт дорожную карту и объяснит, как быстро решить вашу проблему.");
       contactForm.reset();
 
+      // Через 2 секунды показываем экран успеха
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
+
+        // Автоматически открываем PDF
+        const pdfUrl = "/download";
+        window.open(pdfUrl, "_blank");
       }, 2000);
     } else {
       showError(result.message || "Ошибка отправки. Попробуйте позже.");
