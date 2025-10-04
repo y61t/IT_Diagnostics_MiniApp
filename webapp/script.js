@@ -8,6 +8,10 @@ const formMessage = document.getElementById("form-message");
 
 let selectedScenario = null;
 
+const tg = window.Telegram.WebApp;
+const userId = tg.initDataUnsafe.user.id;
+
+
 // Тексты инсайтов и чек-листов
 const insights = {
   1: {
@@ -137,7 +141,13 @@ contactForm.addEventListener("submit", async (e) => {
   if (!email) return showError("Введите email.", emailField);
   if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
 
-  const data = { name, email, telegram, scenario: selectedScenario };
+  const data = {
+  name,
+  email,
+  telegram,
+  scenario: selectedScenario,
+  chat_id: userId
+};
 
   try {
     const response = await fetch("/submit", {
