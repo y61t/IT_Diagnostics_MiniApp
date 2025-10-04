@@ -15,9 +15,15 @@ from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Messa
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 
+# Загружаем локальный .env, если он есть
 load_dotenv()
 
 # === Настройки ===
+REQUIRED_ENVS = ["TELEGRAM_TOKEN", "RAILWAY_URL", "BITRIX_WEBHOOK_URL"]
+for var in REQUIRED_ENVS:
+    if not os.getenv(var):
+        raise RuntimeError(f"❌ Env переменная {var} не задана!")
+
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
@@ -51,6 +57,7 @@ def js():
     return FileResponse("webapp/script.js")
 
 
+# === Submit ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
@@ -102,6 +109,7 @@ async def submit_contact(request: Request):
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
 
+# === Скачать PDF ===
 @app.get("/download")
 def download_pdf():
     return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
@@ -115,9 +123,15 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start(message: Message):
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    button = KeyboardButton(
+        text="🚀 Открыть диагностику IT-рисков",
+        web_app=WebAppInfo(url=RAILWAY_URL)
+    )
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    await message.answer(
+        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
+        reply_markup=keyboard
+    )
 
 
 async def start_bot():
@@ -125,7 +139,7 @@ async def start_bot():
     await dp.start_polling(bot)
 
 
-# === Запуск FastAPI + Telegram вместе ===
+# === Запуск FastAPI + Telegram ===
 if __name__ == "__main__":
     loop = asyncio.get_event_loop()
     loop.create_task(start_bot())
