@@ -130,7 +130,7 @@ async def start(message: Message):
 async def telegram_webhook(request: Request):
     body = await request.json()
     update = types.Update(**body)
-    await dp.feed_update(update)  # ✅ aiogram 3.x
+    await dp.update(update)  # ✅ aiogram 3.x
     return JSONResponse({"ok": True})
 
 
