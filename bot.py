@@ -21,7 +21,7 @@ dp = Dispatcher()
 async def start(message: Message):
     button = KeyboardButton(
         text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url="http://127.0.0.1:8000")
+        web_app=WebAppInfo(url="https://web-production-06edf.up.railway.app/")
     )
 
     keyboard = ReplyKeyboardMarkup(
