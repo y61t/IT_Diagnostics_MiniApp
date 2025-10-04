@@ -4,9 +4,12 @@ from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Messa
 from aiogram.filters import Command
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
+import os
 
 # 🔹 Твой токен
-TOKEN = "8359824125:AAHHLNhEyTqYr7jYmJWEXAAOP3EapVnNOKE"
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+RAILWAY_URL = os.getenv("RAILWAY_URL")
+
 
 # 🔹 Создаём объект бота с дефолтными свойствами
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
@@ -21,7 +24,7 @@ dp = Dispatcher()
 async def start(message: Message):
     button = KeyboardButton(
         text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url="https://itdiagnosticsminiapp-production.up.railway.app/")
+        web_app=WebAppInfo(url=RAILWAY_URL)
     )
 
     keyboard = ReplyKeyboardMarkup(
