@@ -56,18 +56,21 @@ def js():
 
 
 # === Submit формы ===
+# === Submit формы с отправкой PDF через Telegram ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
-    telegram = data.get("telegram", "").strip()
+    telegram_id = data.get("telegram")  # теперь chat_id из WebApp
     scenario_id = str(data.get("scenario", "")).strip()
 
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
     if not email or not EMAIL_REGEX.match(email):
         return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
+    if not telegram_id:
+        return JSONResponse({"status": "error", "message": "Не удалось получить ваш Telegram."}, status_code=400)
 
     scenario_texts = {
         "1": "Проект в кризисе",
@@ -84,8 +87,8 @@ async def submit_contact(request: Request):
             "TITLE": f"Диагностика ИТ-рисков — {scenario}",
             "NAME": name,
             "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
-            "PHONE": [{"VALUE": telegram, "VALUE_TYPE": "WORK"}] if telegram else [],
-            "COMMENTS": f"Сценарий: {scenario}\nTelegram/Phone: {telegram or 'не указан'}\nEmail: {email}",
+            "PHONE": [{"VALUE": str(telegram_id), "VALUE_TYPE": "WORK"}],
+            "COMMENTS": f"Сценарий: {scenario}\nTelegram: {telegram_id}\nEmail: {email}",
             "SOURCE_ID": "WEB",
         },
         "params": {"REGISTER_SONET_EVENT": "Y"}
@@ -100,12 +103,18 @@ async def submit_contact(request: Request):
             print("⚠️ Ошибка Bitrix:", result)
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
+        # ✅ Отправка PDF через Telegram
+        try:
+            await bot.send_document(chat_id=telegram_id, document=open(PDF_PATH, "rb"), caption="Ваш чек-лист IT-рисков")
+        except Exception as e:
+            print("⚠️ Ошибка отправки PDF в Telegram:", e)
+            return JSONResponse({"status": "error", "message": "Не удалось отправить PDF через Telegram."}, status_code=500)
+
+        return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
     except Exception as e:
         print("⚠️ Ошибка при отправке в Bitrix:", e)
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
-
 
 # === Скачать PDF ===
 @app.get("/download")

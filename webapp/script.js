@@ -122,14 +122,12 @@ contactForm.addEventListener("submit", async (e) => {
 
   const nameField = contactForm.querySelector("input[name='name']");
   const emailField = contactForm.querySelector("input[name='email']");
-  const telegramField = contactForm.querySelector("input[name='telegram']");
 
   clearError(nameField);
   clearError(emailField);
 
   const name = nameField.value.trim();
   const email = emailField.value.trim();
-  const telegram = telegramField.value.trim();
 
   if (!name) return showError("Введите имя.", nameField);
   if (!validateName(name)) return showError("Имя должно содержать только буквы, пробелы или дефисы.", nameField);
@@ -137,7 +135,9 @@ contactForm.addEventListener("submit", async (e) => {
   if (!email) return showError("Введите email.", emailField);
   if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
 
-  const data = { name, email, telegram, scenario: selectedScenario };
+  // Получаем chat_id автоматически из WebApp
+  const telegram_id = Telegram.WebApp.initDataUnsafe.user.id;
+  const data = { name, email, scenario: selectedScenario, telegram: telegram_id };
 
   try {
     const response = await fetch("/submit", {
@@ -149,17 +149,13 @@ contactForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (response.ok && result.status === "ok") {
-      showSuccess("Спасибо! Чек-лист уже летит к вам. Наш архитектор также пришлёт дорожную карту и объяснит, как быстро решить вашу проблему.");
+      showSuccess("Спасибо! Чек-лист уже отправлен вам в Telegram. Наш архитектор также пришлёт дорожную карту и объяснит, как быстро решить вашу проблему.");
       contactForm.reset();
 
       // Через 2 секунды показываем экран успеха
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
-
-        // Автоматически открываем PDF
-        const pdfUrl = "/download";
-        window.open(pdfUrl, "_blank");
       }, 2000);
     } else {
       showError(result.message || "Ошибка отправки. Попробуйте позже.");
