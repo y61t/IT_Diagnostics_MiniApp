@@ -21,7 +21,7 @@ dp = Dispatcher()
 async def start(message: Message):
     button = KeyboardButton(
         text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url="https://web-production-06edf.up.railway.app/")
+        web_app=WebAppInfo(url="https://itdiagnosticsminiapp-production.up.railway.app/")
     )
 
     keyboard = ReplyKeyboardMarkup(
@@ -33,7 +33,6 @@ async def start(message: Message):
         "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
         reply_markup=keyboard
     )
-
 
 
 # 🔹 Основная функция запуска бота
