@@ -44,13 +44,16 @@ EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 def index():
     return FileResponse("webapp/index.html")
 
+
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
+
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
+
 
 # === Submit формы ===
 @app.post("/submit")
@@ -103,15 +106,17 @@ async def submit_contact(request: Request):
         print("⚠️ Ошибка при отправке в Bitrix:", e)
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
+
 # === Скачать PDF ===
 @app.get("/download")
 def download_pdf():
     return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
 
+
 # === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)  # обязательно привязываем bot
+dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
 
 @dp.message(Command("start"))
 async def start(message: Message):
@@ -119,13 +124,15 @@ async def start(message: Message):
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
 
+
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
     update = types.Update(**body)
-    await dp.process_update(update)
+    await dp.feed_update(update)  # ✅ aiogram 3.x
     return JSONResponse({"ok": True})
+
 
 # === Установка webhook при старте ===
 @app.on_event("startup")
@@ -134,6 +141,7 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
     print(f"✅ Webhook установлен на {webhook_url}")
+
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
