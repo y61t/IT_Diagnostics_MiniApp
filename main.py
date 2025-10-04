@@ -1,17 +1,30 @@
+import os
+from dotenv import load_dotenv
+import re
+import httpx
+import asyncio
+
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-import httpx
-import os
-from dotenv import load_dotenv
 import uvicorn
-import re
+
+from aiogram import Bot, Dispatcher, types
+from aiogram.filters import Command
+from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
+from aiogram.enums import ParseMode
+from aiogram.client.bot import DefaultBotProperties
 
 load_dotenv()
 
-app = FastAPI()
+# === Настройки ===
+TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+RAILWAY_URL = os.getenv("RAILWAY_URL")
+BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
+PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
 
-# Разрешаем фронтенду обращаться к API
+# === FastAPI ===
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,30 +32,28 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# === Настройки ===
-BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-PDF_PATH = os.getenv("PDF_PATH", "webapp/checklist.pdf")
+EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-# === Маршруты для статики ===
+
+# === Маршруты статики ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
+
 
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
+
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
 
-# === Валидация email ===
-EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
-
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
     telegram = data.get("telegram", "").strip()
@@ -61,7 +72,6 @@ async def submit_contact(request: Request):
         "5": "Цифровая зрелость бизнеса",
         "6": "Проверка бюджета проекта (CFO)"
     }
-
     scenario = scenario_texts.get(scenario_id, "Не указан сценарий")
 
     payload = {
@@ -83,29 +93,41 @@ async def submit_contact(request: Request):
 
         if "error" in result:
             print("⚠️ Ошибка Bitrix:", result)
-            return JSONResponse({
-                "status": "error",
-                "message": "Не удалось создать лид. Проверьте данные."
-            }, status_code=400)
+            return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        print(f"✅ Лид создан: {result.get('result')} — {scenario}")
-        # Возвращаем ссылку на PDF вместе с результатом
-        return JSONResponse({
-            "status": "ok",
-            "lead_id": result.get("result"),
-            "pdf_url": "/download"
-        })
+        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
 
     except Exception as e:
         print("⚠️ Ошибка при отправке в Bitrix:", e)
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
-# === Скачивание PDF ===
+
 @app.get("/download")
 def download_pdf():
     return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
 
 
+# === Telegram Bot ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher()
+
+
+@dp.message(Command("start"))
+async def start(message: Message):
+    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+
+
+async def start_bot():
+    print("Бот запущен ✅")
+    await dp.start_polling(bot)
+
+
+# === Запуск FastAPI + Telegram вместе ===
 if __name__ == "__main__":
+    loop = asyncio.get_event_loop()
+    loop.create_task(start_bot())
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
