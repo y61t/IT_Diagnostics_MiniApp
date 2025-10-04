@@ -2,7 +2,6 @@ import os
 from dotenv import load_dotenv
 import re
 import httpx
-import asyncio
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -14,8 +13,9 @@ from aiogram.filters import Command
 from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
+from aiogram.types.webhook import WebhookRequest
 
-# Загружаем локальный .env, если он есть
+# Загружаем .env
 load_dotenv()
 
 # === Настройки ===
@@ -40,7 +40,6 @@ app.add_middleware(
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-
 # === Маршруты статики ===
 @app.get("/")
 def index():
@@ -57,7 +56,6 @@ def js():
     return FileResponse("webapp/script.js")
 
 
-# === Submit ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
@@ -109,13 +107,11 @@ async def submit_contact(request: Request):
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
 
-# === Скачать PDF ===
 @app.get("/download")
 def download_pdf():
     return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
 
-
-# === Telegram Bot ===
+# === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher()
@@ -123,25 +119,30 @@ dp = Dispatcher()
 
 @dp.message(Command("start"))
 async def start(message: Message):
-    button = KeyboardButton(
-        text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url=RAILWAY_URL)
-    )
+    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer(
-        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
-        reply_markup=keyboard
-    )
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
 
 
-async def start_bot():
-    print("Бот запущен ✅")
-    await dp.start_polling(bot)
+# === Webhook для Telegram ===
+@app.post("/webhook")
+async def telegram_webhook(request: Request):
+    body = await request.json()
+    update = types.Update(**body)
+    await dp.process_update(update)
+    return JSONResponse({"ok": True})
 
 
-# === Запуск FastAPI + Telegram ===
+# === Установка webhook при старте приложения ===
+@app.on_event("startup")
+async def on_startup():
+    webhook_url = f"{RAILWAY_URL}/webhook"
+    await bot.delete_webhook(drop_pending_updates=True)
+    await bot.set_webhook(url=webhook_url)
+    print(f"✅ Webhook установлен на {webhook_url}")
+
+
+# === Запуск FastAPI ===
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.create_task(start_bot())
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
