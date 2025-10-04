@@ -8,7 +8,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
+print("BITRIX_WEBHOOK_URL =", os.getenv("BITRIX_WEBHOOK_URL"))
 
 # 🔹 Твой токен
 TOKEN = os.getenv("TELEGRAM_TOKEN")
