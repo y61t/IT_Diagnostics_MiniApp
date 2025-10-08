@@ -142,7 +142,8 @@ contactForm.addEventListener("submit", async (e) => {
   const data = { name, email, telegram, scenario: selectedScenario, user_id: telegramUserId };
 
   try {
-    const response = await fetch("/submit", {
+    // ✅ исправлено: теперь путь корректный и на Railway, и локально
+    const response = await fetch(`${window.location.origin}/submit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
@@ -159,8 +160,8 @@ contactForm.addEventListener("submit", async (e) => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
 
-        // Автоматически открываем PDF
-        const pdfUrl = "/download";
+        // Автоматически открываем PDF (если есть)
+        const pdfUrl = `${window.location.origin}/download`;
         window.open(pdfUrl, "_blank");
       }, 2000);
     } else {
@@ -171,9 +172,3 @@ contactForm.addEventListener("submit", async (e) => {
     showError("Ошибка сети. Попробуйте позже.");
   }
 });
-
-
-
-
-
-
