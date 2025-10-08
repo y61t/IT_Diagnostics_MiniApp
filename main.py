@@ -61,10 +61,22 @@ dp = Dispatcher(bot=bot)
 async def start(message: Message):
     user_id = message.from_user.id
     webapp_url = f"{RAILWAY_URL}?user_id={user_id}"
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=webapp_url))
+
+    button = KeyboardButton(
+        text="🚀 Открыть диагностику IT-рисков",
+        web_app=WebAppInfo(url=webapp_url)
+    )
     logger.info(f"Создана кнопка: {button}")
-    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=[[button]],
+        resize_keyboard=True
+    )
+
+    await message.answer(
+        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
+        reply_markup=keyboard
+    )
 
 # === Webhook для Telegram ===
 @app.post("/webhook")

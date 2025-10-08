@@ -12,6 +12,7 @@ const formMessage = document.getElementById("form-message");
 // Получаем Telegram user_id из URL
 const urlParams = new URLSearchParams(window.location.search);
 const telegramUserId = urlParams.get("user_id");
+console.log("Telegram user_id:", telegramUserId);
 
 if (!telegramUserId) {
   console.warn("Telegram user_id не передан! Фото не придёт.");
@@ -93,7 +94,7 @@ contactForm.addEventListener("submit", async (e) => {
   if (!validateEmail(email)) return showError("Введите корректный email.", contactForm.email);
 
   const data = { name, email, telegram, scenario: selectedScenario, user_id: telegramUserId };
-
+  console.log("Отправка данных:", data); // проверка
   try {
     const response = await fetch(`${window.location.origin}/submit`, {
       method: "POST",
