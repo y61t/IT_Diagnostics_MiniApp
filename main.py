@@ -28,14 +28,20 @@ app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], all
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
+
 # === Статика ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
+
+
 @app.get("/style.css")
 def css(): return FileResponse("webapp/style.css")
+
+
 @app.get("/script.js")
 def js(): return FileResponse("webapp/script.js")
+
 
 # === Сценарии → картинки ===
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -51,7 +57,8 @@ scenario_images = {
 # === Telegram Bot ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot)
+dp = Dispatcher()
+
 
 async def send_scenario_image(chat_id: int, scenario_id: str):
     print(f"🔹 Отправка картинок для chat_id={chat_id}, сценарий={scenario_id}")
@@ -65,6 +72,7 @@ async def send_scenario_image(chat_id: int, scenario_id: str):
         print(f"📤 Отправка файла: {img_path}")
         photo = InputFile(img_path)
         await bot.send_photo(chat_id=chat_id, photo=photo, caption="Ваш чек-лист по сценарию")
+
 
 # === Submit формы ===
 @app.post("/submit")
@@ -83,7 +91,9 @@ async def submit_contact(request: Request):
     try:
         # Отправка лида в Bitrix
         print("📤 Отправка лида в Bitrix...")
-        payload = {"fields":{"TITLE":f"Диагностика IT-рисков — {scenario_id}","NAME":name,"EMAIL":[{"VALUE":email,"VALUE_TYPE":"WORK"}],"COMMENTS":f"Сценарий: {scenario_id}"},"params":{"REGISTER_SONET_EVENT":"Y"}}
+        payload = {"fields": {"TITLE": f"Диагностика IT-рисков — {scenario_id}", "NAME": name,
+                              "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
+                              "COMMENTS": f"Сценарий: {scenario_id}"}, "params": {"REGISTER_SONET_EVENT": "Y"}}
         async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
             result = r.json()
@@ -101,12 +111,14 @@ async def submit_contact(request: Request):
         print("⚠️ Ошибка submit:", e)
         return JSONResponse({"status": "error", "message": "Ошибка на сервере"}, status_code=500)
 
+
 # === Telegram /start + WebApp ===
 @dp.message(Command("start"))
 async def start(message: Message):
     button = KeyboardButton(text="🚀 Открыть диагностику", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику:", reply_markup=keyboard)
+
 
 # === Webhook Telegram ===
 @app.post("/webhook")
@@ -116,6 +128,7 @@ async def telegram_webhook(request: Request):
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
 
+
 # === Установка webhook ===
 @app.on_event("startup")
 async def on_startup():
@@ -123,6 +136,7 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
     print(f"✅ Webhook установлен на {webhook_url}")
+
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
