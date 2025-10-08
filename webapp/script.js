@@ -9,16 +9,12 @@ const insightText = document.getElementById("insight-text");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
 
-// === Получаем Telegram user_id через JS API ===
+window.Telegram.WebApp.ready();
+
 let telegramUserId = null;
-if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
     telegramUserId = window.Telegram.WebApp.initDataUnsafe.user.id;
     console.log("Telegram user_id через WebApp API:", telegramUserId);
-} else {
-    // fallback через URL
-    const urlParams = new URLSearchParams(window.location.search);
-    telegramUserId = urlParams.get("user_id");
-    console.log("Telegram user_id через URL:", telegramUserId);
 }
 
 if (!telegramUserId) {
