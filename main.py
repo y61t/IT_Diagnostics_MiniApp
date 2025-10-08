@@ -10,14 +10,12 @@ import uvicorn
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
+from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message, InputFile
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 
-# Загружаем .env
+# === Load env ===
 load_dotenv()
-
-# === Настройки ===
 REQUIRED_ENVS = ["TELEGRAM_TOKEN", "RAILWAY_URL", "BITRIX_WEBHOOK_URL"]
 for var in REQUIRED_ENVS:
     if not os.getenv(var):
@@ -26,7 +24,6 @@ for var in REQUIRED_ENVS:
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
 
 # === FastAPI ===
 app = FastAPI()
@@ -54,6 +51,29 @@ def css():
 def js():
     return FileResponse("webapp/script.js")
 
+# === Сценарии → картинки ===
+scenario_images = {
+    "1": ["webapp/images/1.png"],
+    "2": ["webapp/images/2.png"],
+    "3": ["webapp/images/3.png"],
+    "4": ["webapp/images/4.png"],
+    "5": ["webapp/images/5.png"],
+    "6": ["webapp/images/6.png"],
+}
+
+# === Telegram Bot ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher(bot=bot)
+
+
+# === Вспомогательная функция отправки изображений по сценарию ===
+async def send_scenario_image(chat_id: int, scenario_id: str):
+    images = scenario_images.get(scenario_id, [])
+    for img_path in images:
+        photo = InputFile(img_path)
+        await bot.send_photo(chat_id=chat_id, photo=photo, caption="Ваш чек-лист по сценарию")
+
 
 # === Submit формы ===
 @app.post("/submit")
@@ -61,7 +81,7 @@ async def submit_contact(request: Request):
     data = await request.json()
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
-    telegram = data.get("telegram", "").strip()
+    telegram_user_id = data.get("telegram_user_id")  # теперь это user.id
     scenario_id = str(data.get("scenario", "")).strip()
 
     if not name:
@@ -84,14 +104,15 @@ async def submit_contact(request: Request):
             "TITLE": f"Диагностика ИТ-рисков — {scenario}",
             "NAME": name,
             "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
-            "PHONE": [{"VALUE": telegram, "VALUE_TYPE": "WORK"}] if telegram else [],
-            "COMMENTS": f"Сценарий: {scenario}\nTelegram/Phone: {telegram or 'не указан'}\nEmail: {email}",
+            "PHONE": [],  # больше не спрашиваем
+            "COMMENTS": f"Сценарий: {scenario}\nEmail: {email}",
             "SOURCE_ID": "WEB",
         },
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
 
     try:
+        # Отправка лида в Bitrix
         async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
             result = r.json()
@@ -100,29 +121,29 @@ async def submit_contact(request: Request):
             print("⚠️ Ошибка Bitrix:", result)
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
+        # Отправка картинки через Telegram
+        if telegram_user_id:
+            await send_scenario_image(int(telegram_user_id), scenario_id)
+
+        return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
     except Exception as e:
         print("⚠️ Ошибка при отправке в Bitrix:", e)
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
 
-# === Скачать PDF ===
-@app.get("/download")
-def download_pdf():
-    return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
-
-
-# === Telegram Bot через Webhook ===
-default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
-bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
-
+# === Telegram Bot /start + WebApp кнопка ===
 @dp.message(Command("start"))
 async def start(message: Message):
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    button = KeyboardButton(
+        text="🚀 Открыть диагностику IT-рисков",
+        web_app=WebAppInfo(url=RAILWAY_URL)
+    )
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    await message.answer(
+        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
+        reply_markup=keyboard
+    )
 
 
 # === Webhook для Telegram ===
@@ -130,7 +151,7 @@ async def start(message: Message):
 async def telegram_webhook(request: Request):
     body = await request.json()
     update = types.Update(**body)
-    await dp.feed_update(bot, update)  # ✅ aiogram 3.x
+    await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
 
 
