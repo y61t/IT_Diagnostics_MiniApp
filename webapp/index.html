@@ -6,38 +6,81 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- === Экраны === -->
+  <!-- Экран 1 -->
   <div class="container" id="screen1">
-    <h1>💻 Диагностика IT-рисков</h1>
+    <h1>💻 Ваш ИТ-проект может стоить в 2 раза дороже.<br>Хотите проверить риски за 2 минуты?</h1>
+    <p class="subtitle">
+      8 из 10 компаний теряют миллионы на цифровизации — из-за ошибок, которые можно предсказать заранее.<br>
+      Узнайте, где ваши деньги сгорят.
+    </p>
+
     <div id="scenario-buttons">
       <button data-scenario="1">🔥 Проект уже трещит по швам</button>
-      <button data-scenario="2">🚀 Готовлю запуск</button>
-      <button data-scenario="3">⚠️ Опасаюсь импортозамещения</button>
-      <button data-scenario="4">👥 Проверяю подрядчика</button>
-      <button data-scenario="5">📊 Проверяю зрелость бизнеса</button>
-      <button data-scenario="6">💰 Проверяю бюджет</button>
+      <button data-scenario="2">🚀 Готовлю запуск ИТ-проекта</button>
+      <button data-scenario="3">⚠️ Опасаюсь импортозамещения и стратегии</button>
+      <button data-scenario="4">👥 Хочу проверить подрядчика и команду</button>
+      <button data-scenario="5">📊 Не уверен в цифровой зрелости бизнеса</button>
+      <button data-scenario="6">💰 Я CFO, хочу проверить бюджет проекта</button>
     </div>
   </div>
 
+  <!-- Экран 2 -->
   <div class="container hidden" id="screen2">
     <h2>🔍 Инсайт</h2>
     <div id="insight-text" class="insight"></div>
     <button id="next-contact" class="primary">Продолжить</button>
   </div>
 
+  <!-- Экран 3 -->
   <div class="container hidden" id="screen3">
-    <h2>📩 Получите чек-лист</h2>
+    <h2>📩 Получите чек-лист и рекомендации под ваш случай</h2>
+    <p class="subtitle">
+      Заполните данные, чтобы получить чек-лист и персональные советы.
+    </p>
+
     <form id="contact-form">
       <input type="text" name="name" placeholder="Имя" required>
       <input type="email" name="email" placeholder="Email" required>
       <input type="text" name="telegram" placeholder="Telegram / Телефон">
-      <input type="hidden" id="user_id" name="user_id">
       <button type="submit" class="primary">📩 Получить чек-лист</button>
     </form>
+
     <p id="form-message" class="message"></p>
   </div>
 
+  <!-- Экран 4 -->
   <div class="container hidden" id="screen4">
-    <h2>✅ Спасибо!</h2>
-    <p>Ваш чек-лист отправлен в Telegram.</p>
+    <h2>⏳ Пока готовится ваш чек-лист…</h2>
+    <p class="subtitle">Посмотрите реальные кейсы:</p>
+    <ul class="cases">
+      <li>🏭 Как мы спасли ERP-проект на заводе за 2 недели</li>
+      <li>🏦 Как защитили бюджет банка на 200 млн ₽</li>
+    </ul>
+    <a href="https://t.me/your_channel" target="_blank" class="primary-link">Смотреть кейсы</a>
   </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
