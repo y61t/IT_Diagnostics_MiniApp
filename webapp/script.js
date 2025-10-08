@@ -10,8 +10,15 @@ const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
 
 // Получаем Telegram user_id из URL
-const urlParams = new URLSearchParams(window.location.search);
-const telegramUserId = urlParams.get("user_id");
+let telegramUserId = null;
+
+if (window.Telegram.WebApp && window.Telegram.WebApp.initDataUnsafe) {
+    telegramUserId = window.Telegram.WebApp.initDataUnsafe.user.id;
+    console.log("Telegram user_id через WebApp API:", telegramUserId);
+} else {
+    const urlParams = new URLSearchParams(window.location.search);
+    telegramUserId = urlParams.get("user_id");
+}
 console.log("Telegram user_id:", telegramUserId);
 
 if (!telegramUserId) {
