@@ -8,16 +8,17 @@ const screen4 = document.getElementById("screen4");
 const insightText = document.getElementById("insight-text");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
+const hiddenUserId = document.getElementById("user_id");
 
+// === Инициализация Telegram WebApp ===
 window.Telegram.WebApp.ready();
 
 let telegramUserId = null;
 if (window.Telegram.WebApp.initDataUnsafe && window.Telegram.WebApp.initDataUnsafe.user) {
     telegramUserId = window.Telegram.WebApp.initDataUnsafe.user.id;
     console.log("Telegram user_id через WebApp API:", telegramUserId);
-}
-
-if (!telegramUserId) {
+    if (hiddenUserId) hiddenUserId.value = telegramUserId;
+} else {
     console.warn("Telegram user_id не определён! Фото не придёт.");
 }
 
@@ -39,15 +40,20 @@ function validateNameLength(name) { return name.length >= 2; }
 
 // === Сообщения ===
 function showError(message, field = null) {
-    formMessage.innerText = message; formMessage.style.color = "red"; formMessage.style.display = "block";
+    formMessage.innerText = message;
+    formMessage.style.color = "red";
+    formMessage.style.display = "block";
     if (field) field.classList.add("error");
 }
 function clearError(field = null) {
-    formMessage.innerText = ""; formMessage.style.display = "none";
+    formMessage.innerText = "";
+    formMessage.style.display = "none";
     if (field) field.classList.remove("error");
 }
 function showSuccess(message) {
-    formMessage.innerText = message; formMessage.style.color = "green"; formMessage.style.display = "block";
+    formMessage.innerText = message;
+    formMessage.style.color = "green";
+    formMessage.style.display = "block";
 }
 
 // === Выбор сценария ===
@@ -90,7 +96,13 @@ contactForm.addEventListener("submit", async (e) => {
         return;
     }
 
-    const data = { name, email, telegram, scenario: selectedScenario, user_id: telegramUserId };
+    const data = {
+        name,
+        email,
+        telegram,
+        scenario: selectedScenario,
+        user_id: telegramUserId
+    };
     console.log("Отправка данных:", data);
 
     try {

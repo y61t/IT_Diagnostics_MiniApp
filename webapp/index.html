@@ -6,6 +6,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- === Экран 1: выбор сценария === -->
   <div class="container" id="screen1">
     <h1>💻 Диагностика IT-рисков</h1>
     <div id="scenario-buttons">
@@ -18,23 +19,27 @@
     </div>
   </div>
 
+  <!-- === Экран 2: инсайт === -->
   <div class="container hidden" id="screen2">
     <h2>🔍 Инсайт</h2>
     <div id="insight-text" class="insight"></div>
     <button id="next-contact" class="primary">Продолжить</button>
   </div>
 
+  <!-- === Экран 3: форма контакта === -->
   <div class="container hidden" id="screen3">
     <h2>📩 Получите чек-лист</h2>
     <form id="contact-form">
       <input type="text" name="name" placeholder="Имя" required>
       <input type="email" name="email" placeholder="Email" required>
       <input type="text" name="telegram" placeholder="Telegram / Телефон">
+      <input type="hidden" name="user_id" id="user_id">
       <button type="submit" class="primary">📩 Получить чек-лист</button>
     </form>
     <p id="form-message" class="message"></p>
   </div>
 
+  <!-- === Экран 4: спасибо === -->
   <div class="container hidden" id="screen4">
     <h2>✅ Спасибо!</h2>
     <p>Ваш чек-лист отправлен в Telegram.</p>
