@@ -10,60 +10,12 @@ let selectedScenario = null;
 
 // Тексты инсайтов
 const insights = {
-  1: {
-    text: `
-      <ul>
-        <li>80% кризисных проектов срывают сроки и бюджеты из-за подрядчиков, а не технологий.</li>
-        <li>Средний перерасход = +30–50% к смете.</li>
-        <li>Каждый 3-й проект можно спасти за 2–3 недели при правильной архитектуре.</li>
-      </ul>`,
-    button: 'Получить чек-лист «10 признаков, что проект умирает»'
-  },
-  2: {
-    text: `
-      <ul>
-        <li>70% проектов проваливаются ещё на ТЗ — подрядчик пишет его «под себя».</li>
-        <li>Ошибки на старте = перерасход в миллионы через 6–12 месяцев.</li>
-        <li>Каждый месяц задержки внедрения = минус 5–10% бизнес-эффекта.</li>
-      </ul>`,
-    button: 'Получить чек-лист «5 ошибок при запуске»'
-  },
-  3: {
-    text: `
-      <ul>
-        <li>7 из 10 компаний выбирают софт «по рекламе» — и получают новые зависимости.</li>
-        <li>Импортозамещение без ROI превращается в «галочку ради отчёта».</li>
-        <li>Интегратор всегда продаёт «своё», а не то, что реально нужно бизнесу.</li>
-      </ul>`,
-    button: 'Получить чек-лист «7 ошибок импортозамещения»'
-  },
-  4: {
-    text: `
-      <ul>
-        <li>Подрядчик считает часы, а не результат.</li>
-        <li>В проекте всё держится на одном «ключевом человеке».</li>
-        <li>Вы платите предоплату, но не видите реального прогресса.</li>
-      </ul>`,
-    button: 'Получить чек-лист «5 сигналов, что подрядчик вас подведёт»'
-  },
-  5: {
-    text: `
-      <ul>
-        <li>Конкуренты уже автоматизировали ключевые процессы, а у вас всё вручную.</li>
-        <li>Управленческая отчётность у вас формируется неделями, у конкурентов — «на лету».</li>
-        <li>Конкуренты запускают цифровые сервисы, а вы работаете «как 5 лет назад».</li>
-      </ul>`,
-    button: 'Получить чек-лист «5 признаков, что конкуренты обгоняют вас»'
-  },
-  6: {
-    text: `
-      <ul>
-        <li>ROI никто не считает, есть только «обещания эффективности».</li>
-        <li>Бюджет уже вырос на +30%, но оснований нет.</li>
-        <li>Подрядчик получает деньги за «часы», а не за результат.</li>
-      </ul>`,
-    button: 'Получить чек-лист «7 признаков, что проект сжигает деньги»'
-  }
+  1: { text: "<ul><li>80% кризисных проектов...</li></ul>", button: 'Получить чек-лист «10 признаков»' },
+  2: { text: "<ul><li>70% проектов проваливаются...</li></ul>", button: 'Получить чек-лист «5 ошибок»' },
+  3: { text: "<ul><li>7 из 10 компаний выбирают софт...</li></ul>", button: 'Получить чек-лист «7 ошибок импортозамещения»' },
+  4: { text: "<ul><li>Подрядчик считает часы...</li></ul>", button: 'Получить чек-лист «5 сигналов»' },
+  5: { text: "<ul><li>Конкуренты уже автоматизировали...</li></ul>", button: 'Получить чек-лист «5 признаков»' },
+  6: { text: "<ul><li>ROI никто не считает...</li></ul>", button: 'Получить чек-лист «7 признаков»' }
 };
 
 // Валидация
@@ -76,6 +28,7 @@ function validateName(name) {
 
 // Сообщения
 function showError(message, field = null) {
+  console.log("❌ Ошибка:", message);
   formMessage.innerText = message;
   formMessage.style.color = "red";
   formMessage.style.display = "block";
@@ -87,6 +40,7 @@ function clearError(field = null) {
   if (field) field.classList.remove("error");
 }
 function showSuccess(message) {
+  console.log("✅ Успех:", message);
   formMessage.innerText = message;
   formMessage.style.color = "green";
   formMessage.style.display = "block";
@@ -96,6 +50,7 @@ function showSuccess(message) {
 document.querySelectorAll("#scenario-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
     selectedScenario = btn.dataset.scenario;
+    console.log("Выбран сценарий:", selectedScenario);
     insightText.innerHTML = insights[selectedScenario].text;
     document.getElementById("next-contact").textContent = insights[selectedScenario].button;
     screen1.classList.add("hidden");
@@ -105,6 +60,7 @@ document.querySelectorAll("#scenario-buttons button").forEach(btn => {
 
 // Переход к форме контакта
 document.getElementById("next-contact").addEventListener("click", () => {
+  console.log("Переход к форме контакта");
   screen2.classList.add("hidden");
   screen3.classList.remove("hidden");
 });
@@ -129,9 +85,11 @@ contactForm.addEventListener("submit", async (e) => {
 
   // Telegram WebApp user id
   const telegram_user_id = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  console.log("Telegram user_id:", telegram_user_id);
   if (!telegram_user_id) return showError("Не удалось определить Telegram user_id. Откройте WebApp в Telegram.");
 
   const data = { name, email, telegram_user_id, scenario: selectedScenario };
+  console.log("Отправляем данные на сервер:", data);
 
   try {
     const response = await fetch("/submit", {
@@ -139,13 +97,12 @@ contactForm.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data)
     });
-
     const result = await response.json();
+    console.log("Ответ сервера:", result);
 
     if (response.ok && result.status === "ok") {
       showSuccess("Спасибо! Чек-лист отправлен в Telegram.");
       contactForm.reset();
-
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
@@ -154,7 +111,7 @@ contactForm.addEventListener("submit", async (e) => {
       showError(result.message || "Ошибка отправки. Попробуйте позже.");
     }
   } catch (err) {
-    console.error(err);
+    console.error("Ошибка fetch:", err);
     showError("Ошибка сети. Попробуйте позже.");
   }
 });
