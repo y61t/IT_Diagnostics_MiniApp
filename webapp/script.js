@@ -85,6 +85,7 @@ contactForm.addEventListener("submit", async (e) => {
 
   // Telegram WebApp user id
   const telegram_user_id = window.Telegram?.WebApp?.initDataUnsafe?.user?.id;
+  console.log("Telegram WebApp объект:", window.Telegram);
   console.log("Telegram user_id:", telegram_user_id);
   if (!telegram_user_id) return showError("Не удалось определить Telegram user_id. Откройте WebApp в Telegram.");
 
