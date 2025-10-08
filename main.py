@@ -1,3 +1,4 @@
+import logging
 import os
 from dotenv import load_dotenv
 import re
@@ -12,6 +13,10 @@ from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Messa
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.types.input_file import FSInputFile
+
+# === Логирование ===
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Загружаем .env
 load_dotenv()
@@ -56,10 +61,6 @@ def js():
 # === Submit формы ===
 @app.post("/submit")
 async def submit_form(request: Request):
-    """
-    Получает данные формы с фронтенда (имя, email, сценарий, user_id и т.д.)
-    Отправляет лид в Bitrix и картинки пользователю в Telegram.
-    """
     data = await request.json()
     name = data.get("name")
     email = data.get("email")
@@ -67,7 +68,7 @@ async def submit_form(request: Request):
     scenario = data.get("scenario")
     user_id = data.get("user_id")
 
-    print(f"📩 /submit получен: name={name}, email={email}, telegram={telegram}, scenario={scenario}, user_id={user_id}")
+    logger.info(f"/submit получен: name={name}, email={email}, telegram={telegram}, scenario={scenario}, user_id={user_id}")
 
     # --- 1. Отправляем данные в Bitrix ---
     bitrix_payload = {
@@ -83,9 +84,9 @@ async def submit_form(request: Request):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.post(BITRIX_WEBHOOK_URL, json=bitrix_payload) as resp:
-                print(f"✅ Лид отправлен в Bitrix, status={resp.status}")
+                logger.info(f"Лид отправлен в Bitrix, status={resp.status}")
     except Exception as e:
-        print(f"⚠️ Ошибка отправки в Bitrix: {e}")
+        logger.warning(f"Ошибка отправки в Bitrix: {e}")
 
     # --- 2. Отправляем пользователю картинки ---
     if user_id:
@@ -94,39 +95,29 @@ async def submit_form(request: Request):
             scenario_img_path = f"webapp/images/{scenario}.png"
 
             if not os.path.exists(main_img_path):
-                print(f"⚠️ main.png не найден по пути {main_img_path}")
+                logger.warning(f"main.png не найден по пути {main_img_path}")
             if not os.path.exists(scenario_img_path):
-                print(f"⚠️ сценарий {scenario}.png не найден, используем 1.png")
+                logger.warning(f"сценарий {scenario}.png не найден, используем 1.png")
                 scenario_img_path = "webapp/images/1.png"
 
             main_img = FSInputFile(main_img_path)
             scenario_img = FSInputFile(scenario_img_path)
 
-            print(f"📤 Отправка main.png и сценария {scenario}.png пользователю {user_id}")
+            logger.info(f"Отправка main.png и сценария {scenario}.png пользователю {user_id}")
 
-            await bot.send_photo(
-                chat_id=int(user_id),
-                photo=main_img,
-                caption="📋 Ваш чек-лист готов!"
-            )
+            await bot.send_photo(chat_id=int(user_id), photo=main_img, caption="📋 Ваш чек-лист готов!")
+            await bot.send_photo(chat_id=int(user_id), photo=scenario_img, caption=f"🧩 Ваш сценарий: {scenario}")
 
-            await bot.send_photo(
-                chat_id=int(user_id),
-                photo=scenario_img,
-                caption=f"🧩 Ваш сценарий: {scenario}"
-            )
-
-            print(f"✅ Фото успешно отправлены пользователю {user_id}")
-
+            logger.info(f"Фото успешно отправлены пользователю {user_id}")
         except Exception as e:
-            print(f"⚠️ Ошибка при отправке пользователю {user_id}: {e}")
+            logger.error(f"Ошибка при отправке пользователю {user_id}: {e}")
     else:
-        print("⚠️ user_id отсутствует, фото не отправлено")
+        logger.warning("user_id отсутствует, фото не отправлено")
 
     return JSONResponse({"status": "ok"})
 
 
-# === Telegram Bot через WebApp ===
+# === Telegram Bot ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher(bot=bot)
@@ -136,17 +127,9 @@ dp = Dispatcher(bot=bot)
 async def start(message: Message):
     user_id = message.from_user.id
     webapp_url = f"{RAILWAY_URL}?user_id={user_id}"
-
-    button = KeyboardButton(
-        text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url=webapp_url)
-    )
+    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=webapp_url))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-
-    await message.answer(
-        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
-        reply_markup=keyboard
-    )
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
 
 
 # === Webhook для Telegram ===
@@ -158,16 +141,14 @@ async def telegram_webhook(request: Request):
     return JSONResponse({"ok": True})
 
 
-# === Установка webhook при старте ===
 @app.on_event("startup")
 async def on_startup():
     webhook_url = f"{RAILWAY_URL}/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
-    print(f"✅ Webhook установлен на {webhook_url}")
+    logger.info(f"Webhook установлен на {webhook_url}")
 
 
-# === Запуск FastAPI ===
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
