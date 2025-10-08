@@ -2,12 +2,12 @@ import os
 from dotenv import load_dotenv
 import re
 import httpx
-
+import aiohttp
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
-
+from aiogram.types import FSInputFile
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
@@ -26,7 +26,7 @@ for var in REQUIRED_ENVS:
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
+PDF_PATH = os.getenv("PDF_PATH", "webapp/images/checklist.images")
 
 # === FastAPI ===
 app = FastAPI()
@@ -38,6 +38,7 @@ app.add_middleware(
 )
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
+
 
 # === Статика ===
 @app.get("/")
@@ -57,60 +58,64 @@ def js():
 
 # === Submit формы ===
 @app.post("/submit")
-async def submit_contact(request: Request):
+async def submit_form(request: Request):
+    """
+    Получает данные формы с фронтенда (имя, email, сценарий, user_id и т.д.)
+    Отправляет лид в Bitrix и картинки пользователю в Telegram.
+    """
     data = await request.json()
-    name = data.get("name", "").strip()
-    email = data.get("email", "").strip()
-    telegram = data.get("telegram", "").strip()
-    scenario_id = str(data.get("scenario", "")).strip()
+    name = data.get("name")
+    email = data.get("email")
+    telegram = data.get("telegram")
+    scenario = data.get("scenario")
+    user_id = data.get("user_id")
 
-    if not name:
-        return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
-    if not email or not EMAIL_REGEX.match(email):
-        return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
-
-    scenario_texts = {
-        "1": "Проект в кризисе",
-        "2": "Подготовка запуска ИТ-проекта",
-        "3": "Импортозамещение и стратегия",
-        "4": "Проверка подрядчика и команды",
-        "5": "Цифровая зрелость бизнеса",
-        "6": "Проверка бюджета проекта (CFO)"
-    }
-    scenario = scenario_texts.get(scenario_id, "Не указан сценарий")
-
-    payload = {
+    # --- 1. Отправляем данные в Bitrix ---
+    bitrix_payload = {
         "fields": {
-            "TITLE": f"Диагностика ИТ-рисков — {scenario}",
+            "TITLE": f"IT Диагностика — {name}",
             "NAME": name,
             "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
-            "PHONE": [{"VALUE": telegram, "VALUE_TYPE": "WORK"}] if telegram else [],
-            "COMMENTS": f"Сценарий: {scenario}\nTelegram/Phone: {telegram or 'не указан'}\nEmail: {email}",
-            "SOURCE_ID": "WEB",
+            "COMMENTS": f"Сценарий: {scenario}\nTelegram: {telegram}",
         },
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
 
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
-            result = r.json()
+    async with aiohttp.ClientSession() as session:
+        await session.post(BITRIX_WEBHOOK_URL, json=bitrix_payload)
 
-        if "error" in result:
-            print("⚠️ Ошибка Bitrix:", result)
-            return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
+    # --- 2. Отправляем пользователю картинки ---
+    if user_id:
+        try:
+            main_img_path = "webapp/images/main.png"
+            scenario_img_path = f"webapp/images/{scenario}.png"
 
-        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
+            if not os.path.exists(scenario_img_path):
+                scenario_img_path = "webapp/images/1.png"
 
-    except Exception as e:
-        print("⚠️ Ошибка при отправке в Bitrix:", e)
-        return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
+            main_img = FSInputFile(main_img_path)
+            scenario_img = FSInputFile(scenario_img_path)
+
+            await bot.send_photo(
+                chat_id=int(user_id),
+                photo=main_img,
+                caption="📋 Ваш чек-лист готов!"
+            )
+
+            await bot.send_photo(
+                chat_id=int(user_id),
+                photo=scenario_img,
+                caption=f"🧩 Ваш сценарий: {scenario}"
+            )
+
+        except Exception as e:
+            print(f"⚠️ Ошибка при отправке пользователю {user_id}: {e}")
 
 
 # === Скачать PDF ===
 @app.get("/download")
 def download_pdf():
-    return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
+    return FileResponse(PDF_PATH, media_type="application/images", filename="checklist.images")
 
 
 # === Telegram Bot через Webhook ===
@@ -118,11 +123,22 @@ default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
 
+
 @dp.message(Command("start"))
 async def start(message: Message):
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    user_id = message.from_user.id
+    webapp_url = f"{RAILWAY_URL}?user_id={user_id}"
+
+    button = KeyboardButton(
+        text="🚀 Открыть диагностику IT-рисков",
+        web_app=WebAppInfo(url=webapp_url)
+    )
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+
+    await message.answer(
+        "Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:",
+        reply_markup=keyboard
+    )
 
 
 # === Webhook для Telegram ===
@@ -147,9 +163,3 @@ async def on_startup():
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
-
-
-
-
-
-

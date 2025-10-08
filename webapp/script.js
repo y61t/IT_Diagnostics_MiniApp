@@ -2,6 +2,8 @@ const screen1 = document.getElementById("screen1");
 const screen2 = document.getElementById("screen2");
 const screen3 = document.getElementById("screen3");
 const screen4 = document.getElementById("screen4");
+const urlParams = new URLSearchParams(window.location.search);
+const telegramUserId = urlParams.get("user_id");
 const insightText = document.getElementById("insight-text");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
@@ -137,7 +139,7 @@ contactForm.addEventListener("submit", async (e) => {
   if (!email) return showError("Введите email.", emailField);
   if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
 
-  const data = { name, email, telegram, scenario: selectedScenario };
+  const data = { name, email, telegram, scenario: selectedScenario, user_id: telegramUserId };
 
   try {
     const response = await fetch("/submit", {
