@@ -1,7 +1,7 @@
 import os
-from dotenv import load_dotenv
 import re
 import httpx
+from dotenv import load_dotenv
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -10,23 +10,18 @@ import uvicorn
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
+from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message, InputFile
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 
-# Загружаем .env
+# === Load environment ===
 load_dotenv()
-
-# === Настройки ===
-REQUIRED_ENVS = ["TELEGRAM_TOKEN", "RAILWAY_URL", "BITRIX_WEBHOOK_URL"]
-for var in REQUIRED_ENVS:
-    if not os.getenv(var):
-        raise RuntimeError(f"❌ Env переменная {var} не задана!")
-
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
-RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
+RAILWAY_URL = os.getenv("RAILWAY_URL")
+
+if not TELEGRAM_TOKEN or not BITRIX_WEBHOOK_URL or not RAILWAY_URL:
+    raise RuntimeError("❌ Не найдены переменные окружения. Проверь .env")
 
 # === FastAPI ===
 app = FastAPI()
@@ -34,107 +29,111 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-# === Статика ===
+# === Static ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
-
 
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
-
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
 
+# === Scenarios & Images ===
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+scenario_images = {
+    "1": [os.path.join(BASE_DIR, "webapp/images/1.png")],
+    "2": [os.path.join(BASE_DIR, "webapp/images/2.png")],
+    "3": [os.path.join(BASE_DIR, "webapp/images/3.png")],
+    "4": [os.path.join(BASE_DIR, "webapp/images/4.png")],
+    "5": [os.path.join(BASE_DIR, "webapp/images/5.png")],
+    "6": [os.path.join(BASE_DIR, "webapp/images/6.png")],
+}
 
-# === Submit формы ===
+# === Telegram Bot ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher()
+
+async def send_scenario_image(chat_id: int, scenario_id: str):
+    print(f"🔹 Отправка картинок пользователю {chat_id} (сценарий {scenario_id})")
+    images = scenario_images.get(scenario_id, [])
+    if not images:
+        print("❌ Нет изображений для сценария:", scenario_id)
+        return
+    for img_path in images:
+        if not os.path.exists(img_path):
+            print(f"❌ Файл не найден: {img_path}")
+            continue
+        print(f"📤 Отправка файла: {img_path}")
+        await bot.send_photo(chat_id=chat_id, photo=InputFile(img_path), caption="Ваш чек-лист по сценарию")
+
+# === Form submit ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
+    print("📥 Получены данные формы:", data)
+
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
-    telegram = data.get("telegram", "").strip()
+    telegram_user_id = data.get("telegram_user_id")
     scenario_id = str(data.get("scenario", "")).strip()
 
-    if not name:
-        return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
-    if not email or not EMAIL_REGEX.match(email):
-        return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
-
-    scenario_texts = {
-        "1": "Проект в кризисе",
-        "2": "Подготовка запуска ИТ-проекта",
-        "3": "Импортозамещение и стратегия",
-        "4": "Проверка подрядчика и команды",
-        "5": "Цифровая зрелость бизнеса",
-        "6": "Проверка бюджета проекта (CFO)"
-    }
-    scenario = scenario_texts.get(scenario_id, "Не указан сценарий")
-
-    payload = {
-        "fields": {
-            "TITLE": f"Диагностика ИТ-рисков — {scenario}",
-            "NAME": name,
-            "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
-            "PHONE": [{"VALUE": telegram, "VALUE_TYPE": "WORK"}] if telegram else [],
-            "COMMENTS": f"Сценарий: {scenario}\nTelegram/Phone: {telegram or 'не указан'}\nEmail: {email}",
-            "SOURCE_ID": "WEB",
-        },
-        "params": {"REGISTER_SONET_EVENT": "Y"}
-    }
+    if not name or not email or not EMAIL_REGEX.match(email):
+        return JSONResponse({"status": "error", "message": "Некорректные данные"}, status_code=400)
 
     try:
+        # === Отправка лида в Bitrix ===
+        print("📤 Отправка лида в Bitrix...")
+        payload = {
+            "fields": {
+                "TITLE": f"Диагностика IT-рисков — {scenario_id}",
+                "NAME": name,
+                "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
+                "COMMENTS": f"Сценарий: {scenario_id}"
+            },
+            "params": {"REGISTER_SONET_EVENT": "Y"}
+        }
         async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
             result = r.json()
+        print("📌 Bitrix ответ:", result)
 
-        if "error" in result:
-            print("⚠️ Ошибка Bitrix:", result)
-            return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
+        # === Отправка картинки пользователю ===
+        if telegram_user_id:
+            await send_scenario_image(int(telegram_user_id), scenario_id)
+        else:
+            print("❌ Telegram user_id не указан")
 
-        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
-
+        return JSONResponse({"status": "ok", "lead_id": result.get("result")})
     except Exception as e:
-        print("⚠️ Ошибка при отправке в Bitrix:", e)
-        return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
+        print("⚠️ Ошибка submit:", e)
+        return JSONResponse({"status": "error", "message": "Ошибка на сервере"}, status_code=500)
 
-
-# === Скачать PDF ===
-@app.get("/download")
-def download_pdf():
-    return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
-
-
-# === Telegram Bot через Webhook ===
-default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
-bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
-
+# === Telegram /start ===
 @dp.message(Command("start"))
 async def start(message: Message):
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    button = KeyboardButton(text="🚀 Пройти диагностику", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику:", reply_markup=keyboard)
 
-
-# === Webhook для Telegram ===
+# === Telegram webhook ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
     update = types.Update(**body)
-    await dp.feed_update(bot, update)  # ✅ aiogram 3.x
+    await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
 
-
-# === Установка webhook при старте ===
+# === Startup: set webhook ===
 @app.on_event("startup")
 async def on_startup():
     webhook_url = f"{RAILWAY_URL}/webhook"
@@ -142,23 +141,7 @@ async def on_startup():
     await bot.set_webhook(url=webhook_url)
     print(f"✅ Webhook установлен на {webhook_url}")
 
-
-# === Запуск FastAPI ===
+# === Run ===
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
