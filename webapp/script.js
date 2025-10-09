@@ -7,6 +7,7 @@ const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
 
 let selectedScenario = null;
+let telegramUserId = null; // сюда запишем user.id из Telegram WebApp
 
 const insights = {
   1: { text: "80% кризисных проектов...", button: "Получить чек-лист «10 признаков»" },
@@ -22,6 +23,16 @@ function showMessage(text, color = "black") {
   formMessage.style.color = color;
   formMessage.innerText = text;
 }
+
+// Получаем Telegram user.id при полной загрузке WebApp
+function initTelegramUserId() {
+  if (window.Telegram?.WebApp) {
+    window.Telegram.WebApp.ready();
+    telegramUserId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
+    console.log("🔹 Telegram WebApp user.id:", telegramUserId);
+  }
+}
+document.addEventListener("DOMContentLoaded", initTelegramUserId);
 
 // === Сценарии ===
 document.querySelectorAll("#scenario-buttons button").forEach(btn => {
@@ -48,18 +59,14 @@ contactForm.addEventListener("submit", async e => {
 
   if (!name || !email) return showMessage("Заполните все поля.", "red");
 
-  // Получаем user.id из Telegram WebApp
-  const webappUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || null;
-  console.log("webappUserId:", webappUserId);
-
   const payload = {
     name,
     email,
     scenario: selectedScenario,
-    telegram_user_id: webappUserId,
+    telegram_user_id: telegramUserId,
   };
 
-  console.log("📤 Отправляем:", payload);
+  console.log("📤 Отправляем payload:", payload);
 
   try {
     const resp = await fetch("/submit", {
