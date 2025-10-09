@@ -7,8 +7,9 @@ const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
 
 let selectedScenario = null;
-let telegramUserId = null; // сюда запишем user.id из Telegram WebApp
+let telegramUserId = null;
 
+// Сценарии
 const insights = {
   1: { text: "80% кризисных проектов...", button: "Получить чек-лист «10 признаков»" },
   2: { text: "70% проектов проваливаются...", button: "Получить чек-лист «5 ошибок»" },
@@ -22,19 +23,22 @@ function showMessage(text, color = "black") {
   formMessage.style.display = "block";
   formMessage.style.color = color;
   formMessage.innerText = text;
+  console.log(`💬 ${color.toUpperCase()}: ${text}`);
 }
 
-// Получаем Telegram user.id при полной загрузке WebApp
+// Получаем Telegram user.id сразу после загрузки страницы
 function initTelegramUserId() {
   if (window.Telegram?.WebApp) {
     window.Telegram.WebApp.ready();
     telegramUserId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
     console.log("🔹 Telegram WebApp user.id:", telegramUserId);
+  } else {
+    console.log("⚠️ Telegram WebApp не найден");
   }
 }
 document.addEventListener("DOMContentLoaded", initTelegramUserId);
 
-// === Сценарии ===
+// === Сценарии кнопки ===
 document.querySelectorAll("#scenario-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
     selectedScenario = btn.dataset.scenario;
@@ -42,18 +46,19 @@ document.querySelectorAll("#scenario-buttons button").forEach(btn => {
     document.getElementById("next-contact").innerText = insights[selectedScenario].button;
     screen1.classList.add("hidden");
     screen2.classList.remove("hidden");
+    console.log(`🔹 Сценарий выбран: ${selectedScenario}`);
   });
 });
 
 document.getElementById("next-contact").addEventListener("click", () => {
   screen2.classList.add("hidden");
   screen3.classList.remove("hidden");
+  console.log("🔹 Переход к экрану с формой");
 });
 
 // === Отправка формы ===
 contactForm.addEventListener("submit", async e => {
   e.preventDefault();
-
   const name = contactForm.querySelector("input[name='name']").value.trim();
   const email = contactForm.querySelector("input[name='email']").value.trim();
 
@@ -87,7 +92,7 @@ contactForm.addEventListener("submit", async e => {
       showMessage(result.message || "Ошибка при отправке.", "red");
     }
   } catch (err) {
-    console.error("Ошибка:", err);
+    console.error("❌ Ошибка сети:", err);
     showMessage("Ошибка сети. Попробуйте позже.", "red");
   }
 });
