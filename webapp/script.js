@@ -5,11 +5,41 @@ const screen4 = document.getElementById("screen4");
 const insightText = document.getElementById("insight-text");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
+const logBox = document.getElementById("log-box");
 
 let selectedScenario = null;
 let telegramUserId = null;
 
-// Сценарии
+function log(msg) {
+  console.log(msg);
+  logBox.innerHTML += `<div>${msg}</div>`;
+  logBox.scrollTop = logBox.scrollHeight;
+}
+
+// === Инициализация Telegram WebApp ===
+document.addEventListener("DOMContentLoaded", () => {
+  log("🟡 DOM загружен, инициализация Telegram WebApp...");
+
+  if (window.Telegram?.WebApp) {
+    log("✅ Telegram WebApp найден, вызываем ready()");
+    window.Telegram.WebApp.ready();
+
+    const tg = window.Telegram.WebApp;
+    log("📦 initData:", tg.initData || "(пусто)");
+    log("📦 initDataUnsafe:", JSON.stringify(tg.initDataUnsafe, null, 2));
+
+    telegramUserId = tg.initDataUnsafe?.user?.id || null;
+    if (telegramUserId) {
+      log(`✅ Получен Telegram user.id: ${telegramUserId}`);
+    } else {
+      log("⚠️ user.id отсутствует в initDataUnsafe!");
+    }
+  } else {
+    log("❌ Telegram WebApp не найден! Проверь, открыт ли бот через Telegram.");
+  }
+});
+
+// === Данные сценариев ===
 const insights = {
   1: { text: "80% кризисных проектов...", button: "Получить чек-лист «10 признаков»" },
   2: { text: "70% проектов проваливаются...", button: "Получить чек-лист «5 ошибок»" },
@@ -19,26 +49,7 @@ const insights = {
   6: { text: "ROI никто не считает...", button: "Получить чек-лист «7 признаков»" },
 };
 
-function showMessage(text, color = "black") {
-  formMessage.style.display = "block";
-  formMessage.style.color = color;
-  formMessage.innerText = text;
-  console.log(`💬 ${color.toUpperCase()}: ${text}`);
-}
-
-// Получаем Telegram user.id сразу после загрузки страницы
-function initTelegramUserId() {
-  if (window.Telegram?.WebApp) {
-    window.Telegram.WebApp.ready();
-    telegramUserId = window.Telegram.WebApp.initDataUnsafe?.user?.id || null;
-    console.log("🔹 Telegram WebApp user.id:", telegramUserId);
-  } else {
-    console.log("⚠️ Telegram WebApp не найден");
-  }
-}
-document.addEventListener("DOMContentLoaded", initTelegramUserId);
-
-// === Сценарии кнопки ===
+// === Сценарии ===
 document.querySelectorAll("#scenario-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
     selectedScenario = btn.dataset.scenario;
@@ -46,23 +57,28 @@ document.querySelectorAll("#scenario-buttons button").forEach(btn => {
     document.getElementById("next-contact").innerText = insights[selectedScenario].button;
     screen1.classList.add("hidden");
     screen2.classList.remove("hidden");
-    console.log(`🔹 Сценарий выбран: ${selectedScenario}`);
+    log(`🟢 Сценарий выбран: ${selectedScenario}`);
   });
 });
 
 document.getElementById("next-contact").addEventListener("click", () => {
   screen2.classList.add("hidden");
   screen3.classList.remove("hidden");
-  console.log("🔹 Переход к экрану с формой");
+  log("🟢 Переход к экрану формы");
 });
 
 // === Отправка формы ===
 contactForm.addEventListener("submit", async e => {
   e.preventDefault();
+  log("📤 Отправка формы началась");
+
   const name = contactForm.querySelector("input[name='name']").value.trim();
   const email = contactForm.querySelector("input[name='email']").value.trim();
 
-  if (!name || !email) return showMessage("Заполните все поля.", "red");
+  if (!name || !email) {
+    showMessage("❌ Заполните все поля!", "red");
+    return;
+  }
 
   const payload = {
     name,
@@ -70,8 +86,7 @@ contactForm.addEventListener("submit", async e => {
     scenario: selectedScenario,
     telegram_user_id: telegramUserId,
   };
-
-  console.log("📤 Отправляем payload:", payload);
+  log("📦 Payload к отправке: " + JSON.stringify(payload));
 
   try {
     const resp = await fetch("/submit", {
@@ -79,20 +94,28 @@ contactForm.addEventListener("submit", async e => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });
+
     const result = await resp.json();
-    console.log("📥 Ответ сервера:", result);
+    log("📥 Ответ сервера: " + JSON.stringify(result));
 
     if (resp.ok && result.status === "ok") {
-      showMessage("✅ Чек-лист отправлен в Telegram!", "green");
+      showMessage("✅ Чек-лист отправлен!", "green");
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
-      }, 1200);
+      }, 1000);
     } else {
       showMessage(result.message || "Ошибка при отправке.", "red");
     }
   } catch (err) {
-    console.error("❌ Ошибка сети:", err);
+    log("❌ Ошибка сети: " + err);
     showMessage("Ошибка сети. Попробуйте позже.", "red");
   }
 });
+
+function showMessage(text, color = "black") {
+  formMessage.style.display = "block";
+  formMessage.style.color = color;
+  formMessage.innerText = text;
+  log(`💬 MSG: ${text}`);
+}
