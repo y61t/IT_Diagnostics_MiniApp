@@ -54,27 +54,26 @@ bot = Bot(token=TELEGRAM_TOKEN, default=default_props)
 dp = Dispatcher()
 print("✅ Telegram bot initialized")
 
-# === Helper: send scenario image ===
+# === Helper ===
 async def send_scenario_image(chat_id: int, scenario_id: str):
     print(f"🔹 [send_scenario_image] chat_id={chat_id}, scenario_id={scenario_id}")
     images = scenario_images.get(str(scenario_id), [])
     if not images:
-        print(f"⚠️ No images found for scenario {scenario_id}")
+        print(f"⚠️ No images for scenario {scenario_id}")
         return False
-    sent_any = False
     for path in images:
         if not os.path.exists(path):
-            print(f"❌ Missing image file: {path}")
+            print(f"❌ Missing file {path}")
             continue
         try:
             msg = await bot.send_photo(chat_id, InputFile(path), caption=f"Чек-лист — сценарий {scenario_id}")
-            print(f"✅ Photo sent: {path}, message_id={msg.message_id}")
-            sent_any = True
+            print(f"✅ Photo sent: {msg.message_id}")
+            return True
         except Exception as e:
             print(f"⚠️ Error sending photo: {e}")
-    return sent_any
+    return False
 
-# === Submit endpoint ===
+# === Submit ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
@@ -83,16 +82,16 @@ async def submit_contact(request: Request):
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
     scenario_id = str(data.get("scenario", "")).strip()
-    chat_id = data.get("telegram_user_id")  # Telegram WebApp user.id
+    chat_id = data.get("telegram_user_id")
 
-    print(f"🔹 Parsed data -> name: {name}, email: {email}, scenario: {scenario_id}, chat_id: {chat_id}")
+    print(f"🔹 Parsed -> name={name}, email={email}, scenario={scenario_id}, chat_id={chat_id}")
 
     if not name:
-        return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
+        return JSONResponse({"status": "error", "message": "Введите имя"}, status_code=400)
     if not EMAIL_REGEX.match(email):
-        return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
+        return JSONResponse({"status": "error", "message": "Введите корректный email"}, status_code=400)
 
-    # === Send to Bitrix ===
+    # === Bitrix ===
     try:
         payload = {
             "fields": {
@@ -104,37 +103,41 @@ async def submit_contact(request: Request):
             },
             "params": {"REGISTER_SONET_EVENT": "Y"},
         }
-        print(f"📤 Sending lead to Bitrix: {payload}")
-        async with httpx.AsyncClient(timeout=10.0) as client:
+        print(f"📤 Sending to Bitrix: {payload}")
+        async with httpx.AsyncClient(timeout=10) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
             bitrix_res = r.json()
         print("📌 Bitrix response:", bitrix_res)
     except Exception as e:
         print("⚠️ Bitrix error:", e)
-        return JSONResponse({"status": "error", "message": "Ошибка при отправке в CRM."}, status_code=500)
+        return JSONResponse({"status": "error", "message": "Ошибка при отправке в CRM"}, status_code=500)
 
     # === Send Telegram photo ===
     if chat_id:
         try:
             chat_id_int = int(chat_id)
-            print(f"🔹 Sending scenario image to chat_id={chat_id_int}")
+            print(f"🔹 Sending image to Telegram chat_id={chat_id_int}")
             sent = await send_scenario_image(chat_id_int, scenario_id)
             if not sent:
-                print("⚠️ No images sent")
+                print("⚠️ send_scenario_image returned False")
         except Exception as e:
-            print(f"⚠️ Error sending images: {e}")
+            print(f"⚠️ Telegram send error: {e}")
     else:
-        print("⚠️ No telegram_user_id — cannot send photo")
+        print("⚠️ telegram_user_id is None — skipped sending photo")
 
     return JSONResponse({"status": "ok", "lead_id": bitrix_res.get("result")})
 
-# === Telegram /start handler ===
+# === Telegram /start ===
 @dp.message(Command("start"))
 async def start(message: Message):
     print(f"📥 /start from user_id={message.from_user.id}")
-    btn = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    btn = KeyboardButton(
+        text="🚀 Открыть диагностику IT-рисков",
+        web_app=WebAppInfo(url=RAILWAY_URL)
+    )
     kb = ReplyKeyboardMarkup(keyboard=[[btn]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику:", reply_markup=kb)
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы открыть мини-приложение:", reply_markup=kb)
+    print(f"✅ Button sent with URL: {RAILWAY_URL}")
 
 # === Webhook ===
 @app.post("/webhook")
@@ -145,15 +148,14 @@ async def telegram_webhook(request: Request):
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
 
-# === Startup webhook ===
 @app.on_event("startup")
 async def on_startup():
     webhook_url = f"{RAILWAY_URL}/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
-    print(f"✅ Webhook установлен на {webhook_url}")
+    print(f"✅ Webhook set: {webhook_url}")
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 8080))
     print(f"🚀 Starting server on port {port}")
     uvicorn.run(app, host="0.0.0.0", port=port)
