@@ -1,7 +1,9 @@
+
 import os
+from dotenv import load_dotenv
 import re
 import httpx
-from dotenv import load_dotenv
+
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,153 +11,140 @@ import uvicorn
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message, InputFile
+from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 
-# === Load env ===
+# Загружаем .env
 load_dotenv()
+
+# === Настройки ===
+REQUIRED_ENVS = ["TELEGRAM_TOKEN", "RAILWAY_URL", "BITRIX_WEBHOOK_URL"]
+for var in REQUIRED_ENVS:
+    if not os.getenv(var):
+        raise RuntimeError(f"❌ Env переменная {var} не задана!")
+
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
+PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
 
-if not TELEGRAM_TOKEN or not RAILWAY_URL or not BITRIX_WEBHOOK_URL:
-    raise RuntimeError("❌ Missing env vars")
-
-print("✅ ENV loaded: TELEGRAM_TOKEN, RAILWAY_URL, BITRIX_WEBHOOK_URL")
-
-# === FastAPI app ===
+# === FastAPI ===
 app = FastAPI()
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-# === Static files ===
+# === Статика ===
 @app.get("/")
 def index():
-    print("📥 Serving index.html")
     return FileResponse("webapp/index.html")
+
 
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
+
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
 
-# === Images ===
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-scenario_images = {str(i): [os.path.join(BASE_DIR, "webapp", "images", f"{i}.png")] for i in range(1, 7)}
-print(f"✅ Scenario images loaded: {scenario_images}")
 
-# === Telegram bot ===
-default_props = DefaultBotProperties(parse_mode=ParseMode.HTML)
-bot = Bot(token=TELEGRAM_TOKEN, default=default_props)
-dp = Dispatcher()
-print("✅ Telegram bot initialized")
-
-# === Helper ===
-async def send_scenario_image(chat_id: int, scenario_id: str):
-    print(f"🔹 [send_scenario_image] chat_id={chat_id}, scenario_id={scenario_id}")
-    images = scenario_images.get(str(scenario_id), [])
-    if not images:
-        print(f"⚠️ No images for scenario {scenario_id}")
-        return False
-    for path in images:
-        if not os.path.exists(path):
-            print(f"❌ Missing file {path}")
-            continue
-        try:
-            msg = await bot.send_photo(chat_id, InputFile(path), caption=f"Чек-лист — сценарий {scenario_id}")
-            print(f"✅ Photo sent: {msg.message_id}")
-            return True
-        except Exception as e:
-            print(f"⚠️ Error sending photo: {e}")
-    return False
-
-# === Submit ===
+# === Submit формы ===
 @app.post("/submit")
 async def submit_contact(request: Request):
     data = await request.json()
-    print("📥 Received form:", data)
-
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
+    telegram = data.get("telegram", "").strip()
     scenario_id = str(data.get("scenario", "")).strip()
-    chat_id = data.get("telegram_user_id")
-
-    print(f"🔹 Parsed -> name={name}, email={email}, scenario={scenario_id}, chat_id={chat_id}")
 
     if not name:
-        return JSONResponse({"status": "error", "message": "Введите имя"}, status_code=400)
-    if not EMAIL_REGEX.match(email):
-        return JSONResponse({"status": "error", "message": "Введите корректный email"}, status_code=400)
+        return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
+    if not email or not EMAIL_REGEX.match(email):
+        return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
 
-    # === Bitrix ===
+    scenario_texts = {
+        "1": "Проект в кризисе",
+        "2": "Подготовка запуска ИТ-проекта",
+        "3": "Импортозамещение и стратегия",
+        "4": "Проверка подрядчика и команды",
+        "5": "Цифровая зрелость бизнеса",
+        "6": "Проверка бюджета проекта (CFO)"
+    }
+    scenario = scenario_texts.get(scenario_id, "Не указан сценарий")
+
+    payload = {
+        "fields": {
+            "TITLE": f"Диагностика ИТ-рисков — {scenario}",
+            "NAME": name,
+            "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
+            "PHONE": [{"VALUE": telegram, "VALUE_TYPE": "WORK"}] if telegram else [],
+            "COMMENTS": f"Сценарий: {scenario}\nTelegram/Phone: {telegram or 'не указан'}\nEmail: {email}",
+            "SOURCE_ID": "WEB",
+        },
+        "params": {"REGISTER_SONET_EVENT": "Y"}
+    }
+
     try:
-        payload = {
-            "fields": {
-                "TITLE": f"Диагностика IT-рисков — {scenario_id}",
-                "NAME": name,
-                "EMAIL": [{"VALUE": email, "VALUE_TYPE": "WORK"}],
-                "COMMENTS": f"Сценарий: {scenario_id}\nEmail: {email}",
-                "SOURCE_ID": "WEB",
-            },
-            "params": {"REGISTER_SONET_EVENT": "Y"},
-        }
-        print(f"📤 Sending to Bitrix: {payload}")
-        async with httpx.AsyncClient(timeout=10) as client:
+        async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
-            bitrix_res = r.json()
-        print("📌 Bitrix response:", bitrix_res)
+            result = r.json()
+
+        if "error" in result:
+            print("⚠️ Ошибка Bitrix:", result)
+            return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
+
+        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
+
     except Exception as e:
-        print("⚠️ Bitrix error:", e)
-        return JSONResponse({"status": "error", "message": "Ошибка при отправке в CRM"}, status_code=500)
+        print("⚠️ Ошибка при отправке в Bitrix:", e)
+        return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
-    # === Send Telegram photo ===
-    if chat_id:
-        try:
-            chat_id_int = int(chat_id)
-            print(f"🔹 Sending image to Telegram chat_id={chat_id_int}")
-            sent = await send_scenario_image(chat_id_int, scenario_id)
-            if not sent:
-                print("⚠️ send_scenario_image returned False")
-        except Exception as e:
-            print(f"⚠️ Telegram send error: {e}")
-    else:
-        print("⚠️ telegram_user_id is None — skipped sending photo")
 
-    return JSONResponse({"status": "ok", "lead_id": bitrix_res.get("result")})
+# === Скачать PDF ===
+@app.get("/download")
+def download_pdf():
+    return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
 
-# === Telegram /start ===
+
+# === Telegram Bot через Webhook ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
+
 @dp.message(Command("start"))
 async def start(message: Message):
-    print(f"📥 /start from user_id={message.from_user.id}")
-    btn = KeyboardButton(
-        text="🚀 Открыть диагностику IT-рисков",
-        web_app=WebAppInfo(url=RAILWAY_URL)
-    )
-    kb = ReplyKeyboardMarkup(keyboard=[[btn]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы открыть мини-приложение:", reply_markup=kb)
-    print(f"✅ Button sent with URL: {RAILWAY_URL}")
+    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
 
-# === Webhook ===
+
+# === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
-    print("📥 /webhook received:", body)
     update = types.Update(**body)
-    await dp.feed_update(bot, update)
+    await dp.feed_update(bot, update)  # ✅ aiogram 3.x
     return JSONResponse({"ok": True})
 
+
+# === Установка webhook при старте ===
 @app.on_event("startup")
 async def on_startup():
     webhook_url = f"{RAILWAY_URL}/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
-    print(f"✅ Webhook set: {webhook_url}")
+    print(f"✅ Webhook установлен на {webhook_url}")
 
+
+# === Запуск FastAPI ===
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8080))
-    print(f"🚀 Starting server on port {port}")
+    port = int(os.getenv("PORT", 8000))
     uvicorn.run(app, host="0.0.0.0", port=port)

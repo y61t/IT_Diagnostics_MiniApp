@@ -1,3 +1,7 @@
+ЩА я тебе запулю весь код проекта чтоб ты был вкурсе
+
+index.html
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -6,8 +10,6 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="log-box" style="background:#111;color:#0f0;padding:10px;font-size:12px;font-family:monospace;max-height:120px;overflow:auto"></div>
-
   <!-- Экран 1 -->
   <div class="container" id="screen1">
     <h1>💻 Ваш ИТ-проект может стоить в 2 раза дороже.<br>Хотите проверить риски за 2 минуты?</h1>
@@ -36,20 +38,32 @@
   <!-- Экран 3 -->
   <div class="container hidden" id="screen3">
     <h2>📩 Получите чек-лист и рекомендации под ваш случай</h2>
+    <p class="subtitle">
+      Заполните данные, чтобы получить чек-лист и персональные советы.
+    </p>
+
     <form id="contact-form">
       <input type="text" name="name" placeholder="Имя" required>
       <input type="email" name="email" placeholder="Email" required>
+      <input type="text" name="telegram" placeholder="Telegram / Телефон">
       <button type="submit" class="primary">📩 Получить чек-лист</button>
     </form>
+
     <p id="form-message" class="message"></p>
   </div>
 
   <!-- Экран 4 -->
   <div class="container hidden" id="screen4">
-    <h2>✅ Спасибо! Чек-лист отправлен.</h2>
-    <p class="subtitle">Проверьте ваш Telegram 👇</p>
+    <h2>⏳ Пока готовится ваш чек-лист…</h2>
+    <p class="subtitle">Посмотрите реальные кейсы:</p>
+    <ul class="cases">
+      <li>🏭 Как мы спасли ERP-проект на заводе за 2 недели</li>
+      <li>🏦 Как защитили бюджет банка на 200 млн ₽</li>
+    </ul>
+    <a href="https://t.me/your_channel" target="_blank" class="primary-link">Смотреть кейсы</a>
   </div>
 
   <script src="script.js"></script>
 </body>
 </html>
+

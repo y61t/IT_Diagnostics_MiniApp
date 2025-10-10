@@ -1,4 +1,3 @@
-// === Элементы интерфейса ===
 const screen1 = document.getElementById("screen1");
 const screen2 = document.getElementById("screen2");
 const screen3 = document.getElementById("screen3");
@@ -6,137 +5,183 @@ const screen4 = document.getElementById("screen4");
 const insightText = document.getElementById("insight-text");
 const contactForm = document.getElementById("contact-form");
 const formMessage = document.getElementById("form-message");
-const logBox = document.getElementById("log-box");
 
 let selectedScenario = null;
-let telegramUserId = null;
 
-// === Логгер ===
-function log(msg) {
-  console.log(msg);
-  logBox.innerHTML += `<div>${msg}</div>`;
-  logBox.scrollTop = logBox.scrollHeight;
-}
-
-// === Telegram WebApp инициализация ===
-document.addEventListener("DOMContentLoaded", () => {
-  log("🟡 DOM загружен, проверка Telegram WebApp...");
-
-  // Проверка, доступен ли объект Telegram.WebApp
-  if (window.Telegram?.WebApp) {
-    const tg = window.Telegram.WebApp;
-    tg.ready();
-    log("✅ Telegram WebApp найден, инициализация завершена");
-    log("📦 initData:", tg.initData || "(пусто)");
-    log("📦 initDataUnsafe:", JSON.stringify(tg.initDataUnsafe, null, 2));
-
-    // Получаем Telegram user.id
-    telegramUserId = tg.initDataUnsafe?.user?.id || null;
-    if (telegramUserId) {
-      log(`✅ Telegram user.id: ${telegramUserId}`);
-      log("🟢 Соединение с Telegram Mini App установлено");
-      document.body.classList.add("connected");
-    } else {
-      log("⚠️ user.id отсутствует в initDataUnsafe!");
-      document.body.classList.add("not-connected");
-    }
-  } else {
-    log("❌ Telegram WebApp не найден!");
-    log("🔴 Открой это приложение через Telegram Mini App!");
-    document.body.classList.add("not-connected");
-  }
-
-  // Проверка кнопки для ручного открытия Mini App
-  const btnCheck = document.getElementById("tg-open-check");
-  if (btnCheck) {
-    btnCheck.addEventListener("click", () => {
-      log("🧭 Нажата тестовая кнопка для открытия Mini App");
-      window.open("https://t.me/ИМЯ_ТВОЕГО_БОТА", "_blank");
-    });
-  }
-});
-
-// === Данные сценариев ===
+// Тексты инсайтов и чек-листов
 const insights = {
-  1: { text: "80% кризисных проектов срываются из-за потери прозрачности процессов.", button: "Получить чек-лист «10 признаков»" },
-  2: { text: "70% проектов проваливаются из-за отсутствия контроля над изменениями.", button: "Получить чек-лист «5 ошибок»" },
-  3: { text: "7 из 10 компаний выбирают софт неправильно при импортозамещении.", button: "Получить чек-лист «7 ошибок импортозамещения»" },
-  4: { text: "Подрядчик считает часы, а не результат — тревожный сигнал.", button: "Получить чек-лист «5 сигналов»" },
-  5: { text: "Конкуренты уже автоматизировали отчётность, а вы — ещё нет?", button: "Получить чек-лист «5 признаков отставания»" },
-  6: { text: "ROI проекта никто не считает — вы рискуете потратить бюджет впустую.", button: "Получить чек-лист «7 признаков»" },
+  1: {
+    text: `
+      <ul>
+        <li>80% кризисных проектов срывают сроки и бюджеты из-за подрядчиков, а не технологий.</li>
+        <li>Средний перерасход = +30–50% к смете. Это ваш «съеденный ROI».</li>
+        <li>Каждый 3-й проект можно спасти за 2–3 недели при правильной архитектуре.</li>
+      </ul>`,
+    button: 'Получить чек-лист «10 признаков, что проект умирает»'
+  },
+  2: {
+    text: `
+      <ul>
+        <li>70% проектов проваливаются ещё на ТЗ — подрядчик пишет его «под себя».</li>
+        <li>Ошибки на старте = перерасход в миллионы через 6–12 месяцев.</li>
+        <li>Каждый месяц задержки внедрения = минус 5–10% бизнес-эффекта.</li>
+      </ul>`,
+    button: 'Получить чек-лист «5 ошибок при запуске»'
+  },
+  3: {
+    text: `
+      <ul>
+        <li>7 из 10 компаний выбирают софт «по рекламе» — и получают новые зависимости.</li>
+        <li>Импортозамещение без ROI превращается в «галочку ради отчёта».</li>
+        <li>Интегратор всегда продаёт «своё», а не то, что реально нужно бизнесу.</li>
+      </ul>`,
+    button: 'Получить чек-лист «7 ошибок импортозамещения»'
+  },
+  4: {
+    text: `
+      <ul>
+        <li>Подрядчик считает часы, а не результат.</li>
+        <li>В проекте всё держится на одном «ключевом человеке».</li>
+        <li>Вы платите предоплату, но не видите реального прогресса.</li>
+      </ul>`,
+    button: 'Получить чек-лист «5 сигналов, что подрядчик вас подведёт»'
+  },
+  5: {
+    text: `
+      <ul>
+        <li>Конкуренты уже автоматизировали ключевые процессы, а у вас всё вручную.</li>
+        <li>Управленческая отчётность у вас формируется неделями, у конкурентов — «на лету».</li>
+        <li>Конкуренты запускают цифровые сервисы, а вы работаете «как 5 лет назад».</li>
+      </ul>`,
+    button: 'Получить чек-лист «5 признаков, что конкуренты обгоняют вас»'
+  },
+  6: {
+    text: `
+      <ul>
+        <li>ROI никто не считает, есть только «обещания эффективности».</li>
+        <li>Бюджет уже вырос на +30%, но оснований нет.</li>
+        <li>Подрядчик получает деньги за «часы», а не за результат.</li>
+      </ul>`,
+    button: 'Получить чек-лист «7 признаков, что проект сжигает деньги»'
+  }
 };
 
-// === Выбор сценария ===
+// Валидация email и имени
+function validateEmail(email) {
+  return /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
+}
+
+function validateName(name) {
+  return /^[А-Яа-яA-Za-zЁё\s-]+$/.test(name);
+}
+
+function validateNameLength(name) {
+  return name.length >= 2;
+}
+
+// Сообщения
+function showError(message, field = null) {
+  formMessage.innerText = message;
+  formMessage.style.color = "red";
+  formMessage.style.display = "block";
+  if (field) field.classList.add("error");
+}
+
+function clearError(field = null) {
+  formMessage.innerText = "";
+  formMessage.style.display = "none";
+  if (field) field.classList.remove("error");
+}
+
+function showSuccess(message) {
+  formMessage.innerText = message;
+  formMessage.style.color = "green";
+  formMessage.style.display = "block";
+}
+
+// Выбор сценария
 document.querySelectorAll("#scenario-buttons button").forEach(btn => {
   btn.addEventListener("click", () => {
     selectedScenario = btn.dataset.scenario;
-    insightText.innerText = insights[selectedScenario].text;
-    document.getElementById("next-contact").innerText = insights[selectedScenario].button;
+    insightText.innerHTML = insights[selectedScenario].text;
+    document.getElementById("next-contact").textContent = insights[selectedScenario].button;
     screen1.classList.add("hidden");
     screen2.classList.remove("hidden");
-    log(`🟢 Сценарий выбран: ${selectedScenario}`);
   });
 });
 
-// === Переход к форме ===
+// Переход к форме контакта
 document.getElementById("next-contact").addEventListener("click", () => {
   screen2.classList.add("hidden");
   screen3.classList.remove("hidden");
-  log("🟢 Переход к экрану формы контактов");
 });
 
-// === Отправка формы ===
-contactForm.addEventListener("submit", async e => {
+// Отправка формы с валидацией
+contactForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  log("📤 Отправка формы началась...");
 
-  const name = contactForm.querySelector("input[name='name']").value.trim();
-  const email = contactForm.querySelector("input[name='email']").value.trim();
+  const nameField = contactForm.querySelector("input[name='name']");
+  const emailField = contactForm.querySelector("input[name='email']");
+  const telegramField = contactForm.querySelector("input[name='telegram']");
 
-  if (!name || !email) {
-    showMessage("❌ Заполните все поля!", "red");
-    return;
-  }
+  clearError(nameField);
+  clearError(emailField);
 
-  const payload = {
-    name,
-    email,
-    scenario: selectedScenario,
-    telegram_user_id: telegramUserId,
-  };
+  const name = nameField.value.trim();
+  const email = emailField.value.trim();
+  const telegram = telegramField.value.trim();
 
-  log("📦 Payload к отправке: " + JSON.stringify(payload));
+  if (!name) return showError("Введите имя.", nameField);
+  if (!validateName(name)) return showError("Имя должно содержать только буквы, пробелы или дефисы.", nameField);
+  if (!validateNameLength(name)) return showError("Имя должно быть минимум 2 символа.", nameField);
+  if (!email) return showError("Введите email.", emailField);
+  if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
+
+  const data = { name, email, telegram, scenario: selectedScenario };
 
   try {
-    const resp = await fetch("/submit", {
+    const response = await fetch("/submit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(data)
     });
 
-    const result = await resp.json();
-    log("📥 Ответ сервера: " + JSON.stringify(result));
+    const result = await response.json();
 
-    if (resp.ok && result.status === "ok") {
-      showMessage("✅ Чек-лист успешно отправлен!", "green");
+    if (response.ok && result.status === "ok") {
+      showSuccess("Спасибо! Чек-лист уже летит к вам. Наш архитектор также пришлёт дорожную карту и объяснит, как быстро решить вашу проблему.");
+      contactForm.reset();
+
+      // Через 2 секунды показываем экран успеха
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
-        log("🎉 Переход к экрану успеха");
-      }, 1000);
+
+        // Автоматически открываем PDF
+        const pdfUrl = "/download";
+        window.open(pdfUrl, "_blank");
+      }, 2000);
     } else {
-      showMessage(result.message || "Ошибка при отправке данных.", "red");
+      showError(result.message || "Ошибка отправки. Попробуйте позже.");
     }
   } catch (err) {
-    log("❌ Ошибка сети: " + err);
-    showMessage("Ошибка сети. Попробуйте позже.", "red");
+    console.error(err);
+    showError("Ошибка сети. Попробуйте позже.");
   }
 });
 
-// === Вспомогательная функция ===
-function showMessage(text, color = "black") {
-  formMessage.style.display = "block";
-  formMessage.style.color = color;
-  formMessage.innerText = text;
-  log(`💬 MSG: ${text}`);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
