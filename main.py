@@ -15,7 +15,7 @@ import uvicorn
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
+from aiogram.types import WebAppInfo, InlineKeyboardButton, InlineKeyboardMarkup, Message
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
@@ -23,9 +23,6 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
-
-# Хранилище последнего chat_id из webhook
-last_chat_id = None
 
 # Загружаем .env
 load_dotenv()
@@ -51,7 +48,6 @@ app.add_middleware(
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-
 # Валидация init_data от Telegram
 def validate_init_data(init_data_str: str) -> dict:
     params = dict(urllib.parse.parse_qsl(init_data_str))
@@ -64,26 +60,21 @@ def validate_init_data(init_data_str: str) -> dict:
         logger.info(f"✅ Успешная валидация init_data. User ID: {user['id']}")
         return user
     else:
-        logger.error(
-            f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
+        logger.error(f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
         raise ValueError("Invalid init_data hash")
-
 
 # === Статика ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
 
-
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
-
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
-
 
 # === Submit формы ===
 @app.post("/submit")
@@ -95,8 +86,7 @@ async def submit_contact(request: Request):
     scenario_id = str(data.get("scenario", "")).strip()
     init_data = data.get("init_data", "")
 
-    logger.info(
-        f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
+    logger.info(f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
 
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
@@ -132,9 +122,6 @@ async def submit_contact(request: Request):
             user_id = user['id']
         except Exception as e:
             logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
-    else:
-        logger.warning("init_data отсутствует, пытаемся использовать last_chat_id")
-        user_id = last_chat_id  # Используем последний известный chat_id
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -145,14 +132,22 @@ async def submit_contact(request: Request):
             logger.error(f"⚠️ Ошибка Bitrix: {result}")
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        # Отправка текста в Telegram
+        # Отправка фото + текста в Telegram
         if user_id:
             try:
-                await bot.send_message(
-                    chat_id=user_id,
-                    text=f"Спасибо, {name}! Вы выбрали сценарий: {scenario}. Наш архитектор свяжется с вами для дальнейших шагов."
-                )
-                logger.info(f"✅ Сообщение отправлено в Telegram для user_id={user_id}")
+                photo_path = f"webapp/images/{scenario_id}.png"
+                if os.path.exists(photo_path):
+                    await bot.send_photo(
+                        chat_id=user_id,
+                        photo=types.FSInputFile(photo_path),
+                        caption=f"Спасибо, {name}! Вы выбрали сценарий: {scenario}. Вот материалы для вашего случая. Наш архитектор свяжется."
+                    )
+                else:
+                    await bot.send_message(
+                        chat_id=user_id,
+                        text=f"Спасибо, {name}! Вы выбрали сценарий: {scenario}. Наш архитектор свяжется. (Фото не найдено)"
+                    )
+                logger.info(f"✅ Сообщение с фото отправлено в Telegram для user_id={user_id}")
             except TelegramForbiddenError:
                 logger.error(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {user_id}")
             except TelegramBadRequest as e:
@@ -168,36 +163,25 @@ async def submit_contact(request: Request):
         logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
-
 # === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher(bot=bot)
 
-
 @dp.message(Command("start"))
 async def start(message: Message):
-    global last_chat_id
-    last_chat_id = message.chat.id  # Сохраняем chat_id
-    logger.info(f"Сохранён last_chat_id: {last_chat_id}")
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
-    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
+    button = InlineKeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[button]])
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
-
 
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
-    global last_chat_id
     body = await request.json()
-    if 'message' in body and 'chat' in body['message']:
-        last_chat_id = body['message']['chat']['id']  # Обновляем chat_id при каждом сообщении
-        logger.info(f"Обновлён last_chat_id: {last_chat_id}")
     logger.info(f"Получен webhook: {body}")
     update = types.Update(**body)
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
-
 
 # === Установка webhook при старте ===
 @app.on_event("startup")
@@ -207,8 +191,7 @@ async def on_startup():
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Webhook установлен на {webhook_url}")
 
-
 # === Запуск FastAPI ===
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8080))  # Используем 8080, как в логах
+    port = int(os.getenv("PORT", 8080))
     uvicorn.run(app, host="0.0.0.0", port=port)
