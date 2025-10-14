@@ -24,6 +24,9 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Словарь для хранения chat_id по user_id из init_data (если придёт)
+user_chat_map = {}
+
 # Загружаем .env
 load_dotenv()
 
@@ -120,8 +123,13 @@ async def submit_contact(request: Request):
         try:
             user = validate_init_data(init_data)
             user_id = user['id']
+            # Сохраняем связь user_id и chat_id (если есть)
+            if 'start_param' in data:  # Параметр из WebApp
+                user_chat_map[user_id] = user_id  # Пока просто user_id, можно расширить
         except Exception as e:
             logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
+    else:
+        logger.warning("init_data отсутствует, пытаемся использовать последний известный user_id")
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -133,7 +141,7 @@ async def submit_contact(request: Request):
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
         # Отправка фото + текста в Telegram
-        if user_id:
+        if user_id and user_id in user_chat_map:
             try:
                 photo_path = f"webapp/images/{scenario_id}.png"
                 if os.path.exists(photo_path):
@@ -155,7 +163,7 @@ async def submit_contact(request: Request):
             except Exception as e:
                 logger.error(f"❌ Неизвестная ошибка при отправке: {str(e)}")
         else:
-            logger.warning("⚠️ Нет user_id, сообщение не отправлено в TG.")
+            logger.warning("⚠️ Нет user_id или он не привязан, сообщение не отправлено в TG.")
 
         return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
@@ -173,11 +181,18 @@ async def start(message: Message):
     button = InlineKeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[button]])
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    user_chat_map[message.from_user.id] = message.chat.id  # Сохраняем chat_id для user_id
+    logger.info(f"Сохранён chat_id {message.chat.id} для user_id {message.from_user.id}")
 
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
+    if 'message' in body and 'from' in body['message'] and 'chat' in body['message']:
+        user_id = body['message']['from']['id']
+        chat_id = body['message']['chat']['id']
+        user_chat_map[user_id] = chat_id  # Обновляем chat_id для user_id
+        logger.info(f"Обновлён chat_id {chat_id} для user_id {user_id}")
     logger.info(f"Получен webhook: {body}")
     update = types.Update(**body)
     await dp.feed_update(bot, update)
