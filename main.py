@@ -51,6 +51,7 @@ app.add_middleware(
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
+
 # Валидация init_data от Telegram
 def validate_init_data(init_data_str: str) -> dict:
     params = dict(urllib.parse.parse_qsl(init_data_str))
@@ -63,21 +64,26 @@ def validate_init_data(init_data_str: str) -> dict:
         logger.info(f"✅ Успешная валидация init_data. User ID: {user['id']}")
         return user
     else:
-        logger.error(f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
+        logger.error(
+            f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
         raise ValueError("Invalid init_data hash")
+
 
 # === Статика ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
 
+
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
+
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
+
 
 # === Submit формы ===
 @app.post("/submit")
@@ -89,7 +95,8 @@ async def submit_contact(request: Request):
     scenario_id = str(data.get("scenario", "")).strip()
     init_data = data.get("init_data", "")
 
-    logger.info(f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
+    logger.info(
+        f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
 
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
@@ -161,10 +168,12 @@ async def submit_contact(request: Request):
         logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
+
 # === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher(bot=bot)
+
 
 @dp.message(Command("start"))
 async def start(message: Message):
@@ -174,6 +183,7 @@ async def start(message: Message):
     button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+
 
 # === Webhook для Telegram ===
 @app.post("/webhook")
@@ -188,6 +198,7 @@ async def telegram_webhook(request: Request):
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
 
+
 # === Установка webhook при старте ===
 @app.on_event("startup")
 async def on_startup():
@@ -195,6 +206,7 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Webhook установлен на {webhook_url}")
+
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
