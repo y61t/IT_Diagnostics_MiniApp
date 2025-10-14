@@ -8,7 +8,14 @@ const formMessage = document.getElementById("form-message");
 
 let selectedScenario = null;
 
-// Тексты инсайтов и чек-листов
+// Инициализация Telegram WebApp
+if (window.Telegram && window.Telegram.WebApp) {
+  const tg = window.Telegram.WebApp;
+  tg.ready();
+  tg.expand();  // Полноэкранный режим
+}
+
+// Тексты инсайтов и чек-листов (остальное без изменений)
 const insights = {
   1: {
     text: `
@@ -138,6 +145,9 @@ contactForm.addEventListener("submit", async (e) => {
   if (!validateEmail(email)) return showError("Введите корректный email.", emailField);
 
   const data = { name, email, telegram, scenario: selectedScenario };
+  if (window.Telegram && window.Telegram.WebApp) {
+    data.init_data = window.Telegram.WebApp.initData;
+  }
 
   try {
     const response = await fetch("/submit", {
@@ -149,17 +159,13 @@ contactForm.addEventListener("submit", async (e) => {
     const result = await response.json();
 
     if (response.ok && result.status === "ok") {
-      showSuccess("Спасибо! Чек-лист уже летит к вам. Наш архитектор также пришлёт дорожную карту и объяснит, как быстро решить вашу проблему.");
+      showSuccess("Спасибо! Ваши данные отправлены, и вы получите сообщение в Telegram с выбранным сценарием. Наш архитектор свяжется с вами.");
       contactForm.reset();
 
       // Через 2 секунды показываем экран успеха
       setTimeout(() => {
         screen3.classList.add("hidden");
         screen4.classList.remove("hidden");
-
-        // Автоматически открываем PDF
-        const pdfUrl = "/download";
-        window.open(pdfUrl, "_blank");
       }, 2000);
     } else {
       showError(result.message || "Ошибка отправки. Попробуйте позже.");
@@ -169,19 +175,3 @@ contactForm.addEventListener("submit", async (e) => {
     showError("Ошибка сети. Попробуйте позже.");
   }
 });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

@@ -1,11 +1,14 @@
-
 import os
 from dotenv import load_dotenv
 import re
 import httpx
+import hmac
+import hashlib
+import urllib.parse
+import json
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -27,7 +30,6 @@ for var in REQUIRED_ENVS:
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-PDF_PATH = os.getenv("PDF_PATH", "webapp/pdf/checklist.pdf")
 
 # === FastAPI ===
 app = FastAPI()
@@ -40,21 +42,17 @@ app.add_middleware(
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
-# === Статика ===
-@app.get("/")
-def index():
-    return FileResponse("webapp/index.html")
-
-
-@app.get("/style.css")
-def css():
-    return FileResponse("webapp/style.css")
-
-
-@app.get("/script.js")
-def js():
-    return FileResponse("webapp/script.js")
-
+# Валидация init_data от Telegram
+def validate_init_data(init_data_str: str) -> dict:
+    params = dict(urllib.parse.parse_qsl(init_data_str))
+    received_hash = params.pop('hash', None)
+    data_check_string = '\n'.join(f"{k}={v}" for k, v in sorted(params.items()))
+    secret_key = hashlib.sha256(TELEGRAM_TOKEN.encode()).digest()
+    calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
+    if calculated_hash == received_hash:
+        user = json.loads(params['user'])
+        return user
+    raise ValueError("Invalid init_data hash")
 
 # === Submit формы ===
 @app.post("/submit")
@@ -64,6 +62,7 @@ async def submit_contact(request: Request):
     email = data.get("email", "").strip()
     telegram = data.get("telegram", "").strip()
     scenario_id = str(data.get("scenario", "")).strip()
+    init_data = data.get("init_data", "")
 
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
@@ -92,6 +91,14 @@ async def submit_contact(request: Request):
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
 
+    user_id = None
+    if init_data:
+        try:
+            user = validate_init_data(init_data)
+            user_id = user['id']
+        except Exception as e:
+            print("⚠️ Ошибка валидации init_data:", e)
+
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             r = await client.post(BITRIX_WEBHOOK_URL, json=payload)
@@ -101,23 +108,25 @@ async def submit_contact(request: Request):
             print("⚠️ Ошибка Bitrix:", result)
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        return JSONResponse({"status": "ok", "lead_id": result.get("result"), "pdf_url": "/download"})
+        # Отправка текста в Telegram
+        if user_id:
+            await bot.send_message(
+                chat_id=user_id,
+                text=f"Спасибо, {name}! Вы выбрали сценарий: {scenario}. Наш архитектор свяжется с вами для дальнейших шагов."
+            )
+        else:
+            print("⚠️ Нет user_id, сообщение не отправлено в TG.")
+
+        return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
     except Exception as e:
-        print("⚠️ Ошибка при отправке в Bitrix:", e)
+        print("⚠️ Ошибка:", e)
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
-
-
-# === Скачать PDF ===
-@app.get("/download")
-def download_pdf():
-    return FileResponse(PDF_PATH, media_type="application/pdf", filename="checklist.pdf")
-
 
 # === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)  # ✅ привязка бота к Dispatcher
+dp = Dispatcher(bot=bot)
 
 @dp.message(Command("start"))
 async def start(message: Message):
@@ -125,15 +134,13 @@ async def start(message: Message):
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
 
-
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
     update = types.Update(**body)
-    await dp.feed_update(bot, update)  # ✅ aiogram 3.x
+    await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
-
 
 # === Установка webhook при старте ===
 @app.on_event("startup")
@@ -142,7 +149,6 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
     print(f"✅ Webhook установлен на {webhook_url}")
-
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
