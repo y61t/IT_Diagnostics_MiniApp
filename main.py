@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 import re
 import httpx
@@ -18,6 +19,10 @@ from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Messa
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
 from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
+
+# Настройка логирования
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # Загружаем .env
 load_dotenv()
@@ -52,10 +57,10 @@ def validate_init_data(init_data_str: str) -> dict:
     calculated_hash = hmac.new(secret_key, data_check_string.encode(), hashlib.sha256).hexdigest()
     if calculated_hash == received_hash:
         user = json.loads(params['user'])
-        console.log(f"✅ Успешная валидация init_data. User ID: {user['id']}")
+        logger.info(f"✅ Успешная валидация init_data. User ID: {user['id']}")
         return user
     else:
-        console.log(f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
+        logger.error(f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
         raise ValueError("Invalid init_data hash")
 
 # === Статика ===
@@ -81,7 +86,7 @@ async def submit_contact(request: Request):
     scenario_id = str(data.get("scenario", "")).strip()
     init_data = data.get("init_data", "")
 
-    console.log(f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
+    logger.info(f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
 
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
@@ -91,7 +96,7 @@ async def submit_contact(request: Request):
     scenario_texts = {
         "1": "Проект в кризисе",
         "2": "Подготовка запуска ИТ-проекта",
-        "3": "Импортозамещение и стратегия",
+        "3": "Импортозамещения и стратегия",
         "4": "Проверка подрядчика и команды",
         "5": "Цифровая зрелость бизнеса",
         "6": "Проверка бюджета проекта (CFO)"
@@ -116,7 +121,7 @@ async def submit_contact(request: Request):
             user = validate_init_data(init_data)
             user_id = user['id']
         except Exception as e:
-            console.log(f"⚠️ Ошибка валидации init_data: {str(e)}")
+            logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -124,7 +129,7 @@ async def submit_contact(request: Request):
             result = r.json()
 
         if "error" in result:
-            console.log(f"⚠️ Ошибка Bitrix: {result}")
+            logger.error(f"⚠️ Ошибка Bitrix: {result}")
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
         # Отправка текста в Telegram
@@ -134,20 +139,20 @@ async def submit_contact(request: Request):
                     chat_id=user_id,
                     text=f"Спасибо, {name}! Вы выбрали сценарий: {scenario}. Наш архитектор свяжется с вами для дальнейших шагов."
                 )
-                console.log(f"✅ Сообщение отправлено в Telegram для user_id={user_id}")
+                logger.info(f"✅ Сообщение отправлено в Telegram для user_id={user_id}")
             except TelegramForbiddenError:
-                console.log(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {user_id}")
+                logger.error(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {user_id}")
             except TelegramBadRequest as e:
-                console.log(f"❌ Ошибка Telegram: {str(e)}")
+                logger.error(f"❌ Ошибка Telegram: {str(e)}")
             except Exception as e:
-                console.log(f"❌ Неизвестная ошибка при отправке: {str(e)}")
+                logger.error(f"❌ Неизвестная ошибка при отправке: {str(e)}")
         else:
-            console.log("⚠️ Нет user_id, сообщение не отправлено в TG.")
+            logger.warning("⚠️ Нет user_id, сообщение не отправлено в TG.")
 
         return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
     except Exception as e:
-        console.log(f"⚠️ Ошибка: {str(e)}")
+        logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
 # === Telegram Bot через Webhook ===
@@ -165,7 +170,7 @@ async def start(message: Message):
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
-    console.log(f"Получен webhook: {body}")  # Лог для отладки
+    logger.info(f"Получен webhook: {body}")  # Лог для отладки
     update = types.Update(**body)
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
@@ -176,7 +181,7 @@ async def on_startup():
     webhook_url = f"{RAILWAY_URL}/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
-    console.log(f"✅ Webhook установлен на {webhook_url}")
+    logger.info(f"✅ Webhook установлен на {webhook_url}")
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
