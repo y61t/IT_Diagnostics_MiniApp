@@ -153,8 +153,7 @@ async def submit_contact(request: Request):
                 if os.path.exists(main_photo_path):
                     await bot.send_photo(
                         chat_id=chat_id,
-                        photo=types.FSInputFile(main_photo_path),
-                        caption=f"Вы выбрали сценарий: {scenario}. Вот общие материалы. Наш архитектор свяжется."
+                        photo=types.FSInputFile(main_photo_path)
                     )
                     logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
                 else:
@@ -164,7 +163,7 @@ async def submit_contact(request: Request):
                     await bot.send_photo(
                         chat_id=chat_id,
                         photo=types.FSInputFile(scenario_photo_path),
-                        caption=f"Дополнительные материалы для сценария: {scenario}."
+                        caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
                     )
                     logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
                 else:
