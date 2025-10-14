@@ -12,10 +12,13 @@ let selectedScenario = null;
 if (window.Telegram && window.Telegram.WebApp) {
   const tg = window.Telegram.WebApp;
   tg.ready();
-  tg.expand();  // Полноэкранный режим
+  tg.expand(); // Полноэкранный режим
+  console.log("Telegram WebApp initialized. initData:", tg.initData); // Отладка
+} else {
+  console.log("Telegram WebApp not detected. Testing outside Telegram?");
 }
 
-// Тексты инсайтов и чек-листов (остальное без изменений)
+// Тексты инсайтов и чек-листов
 const insights = {
   1: {
     text: `
@@ -147,6 +150,9 @@ contactForm.addEventListener("submit", async (e) => {
   const data = { name, email, telegram, scenario: selectedScenario };
   if (window.Telegram && window.Telegram.WebApp) {
     data.init_data = window.Telegram.WebApp.initData;
+    console.log("Отправляем init_data:", data.init_data); // Отладка
+  } else {
+    console.log("Нет Telegram WebApp, init_data не передано");
   }
 
   try {
