@@ -24,6 +24,9 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Хранилище последнего chat_id из webhook
+last_chat_id = None
+
 # Загружаем .env
 load_dotenv()
 
@@ -96,7 +99,7 @@ async def submit_contact(request: Request):
     scenario_texts = {
         "1": "Проект в кризисе",
         "2": "Подготовка запуска ИТ-проекта",
-        "3": "Импортозамещения и стратегия",
+        "3": "Импортозамещение и стратегия",
         "4": "Проверка подрядчика и команды",
         "5": "Цифровая зрелость бизнеса",
         "6": "Проверка бюджета проекта (CFO)"
@@ -122,6 +125,9 @@ async def submit_contact(request: Request):
             user_id = user['id']
         except Exception as e:
             logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
+    else:
+        logger.warning("init_data отсутствует, пытаемся использовать last_chat_id")
+        user_id = last_chat_id  # Используем последний известный chat_id
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -162,6 +168,9 @@ dp = Dispatcher(bot=bot)
 
 @dp.message(Command("start"))
 async def start(message: Message):
+    global last_chat_id
+    last_chat_id = message.chat.id  # Сохраняем chat_id
+    logger.info(f"Сохранён last_chat_id: {last_chat_id}")
     button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
@@ -169,8 +178,12 @@ async def start(message: Message):
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
+    global last_chat_id
     body = await request.json()
-    logger.info(f"Получен webhook: {body}")  # Лог для отладки
+    if 'message' in body and 'chat' in body['message']:
+        last_chat_id = body['message']['chat']['id']  # Обновляем chat_id при каждом сообщении
+        logger.info(f"Обновлён last_chat_id: {last_chat_id}")
+    logger.info(f"Получен webhook: {body}")
     update = types.Update(**body)
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
@@ -185,5 +198,5 @@ async def on_startup():
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 8080))  # Используем 8080, как в логах
     uvicorn.run(app, host="0.0.0.0", port=port)
