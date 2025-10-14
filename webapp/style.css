@@ -3,57 +3,65 @@ body {
   background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
   color: #1e1e2d;
   text-align: center;
-  padding: 40px 20px;
+  padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 18px; /* Увеличен базовый размер шрифта */
+  font-size: 20px; /* Увеличен базовый размер шрифта */
+  height: 100vh; /* Занимает всю высоту экрана */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .container {
   background: #fff;
-  padding: 40px 30px; /* Увеличен внутренний отступ */
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  max-width: 520px;
-  margin: 0 auto 40px auto; /* Увеличен внешний отступ */
+  padding: 50px 40px; /* Увеличены внутренние отступы */
+  border-radius: 20px; /* Увеличен радиус для современного вида */
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1); /* Усилена тень */
+  width: 100%; /* Занимает всю ширину экрана */
+  max-width: none; /* Убрано ограничение по ширине */
+  min-height: 90vh; /* Минимум 90% высоты экрана */
+  margin: 0; /* Убраны внешние отступы */
   transition: opacity 0.4s ease;
+  box-sizing: border-box; /* Учитываем padding в размере */
 }
 
 .hidden { display: none; }
 
 h1 {
-  font-size: 28px; /* Увеличен размер заголовка */
-  margin-bottom: 20px;
+  font-size: 32px; /* Увеличен размер заголовка */
+  margin-bottom: 25px;
   color: #2d3e50;
   line-height: 1.4;
 }
 h2 {
-  font-size: 24px; /* Увеличен размер подзаголовка */
-  margin-bottom: 16px;
+  font-size: 28px; /* Увеличен размер подзаголовка */
+  margin-bottom: 20px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 18px; /* Увеличен размер текста */
-  margin-bottom: 30px;
+  font-size: 20px; /* Увеличен размер текста */
+  margin-bottom: 35px;
   line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Увеличен промежуток между кнопками */
+  gap: 20px; /* Увеличен промежуток между кнопками */
 }
 
 button {
   border: none;
-  border-radius: 12px; /* Немного увеличен радиус */
-  padding: 18px 24px; /* Увеличены внутренние отступы */
-  font-size: 18px; /* Увеличен размер текста */
+  border-radius: 15px; /* Увеличен радиус */
+  padding: 20px 30px; /* Увеличены внутренние отступы */
+  font-size: 20px; /* Увеличен размер текста */
   cursor: pointer;
   transition: all 0.25s ease;
-  font-weight: 500;
+  font-weight: 600; /* Увеличена жирность для читаемости */
 }
-button:hover { transform: translateY(-2px); } /* Увеличен эффект наведения */
+button:hover { transform: translateY(-3px); } /* Увеличен эффект наведения */
 
 button.primary {
   background: #4361ee;
@@ -72,49 +80,49 @@ button.primary:hover {
 }
 
 input {
-  width: 90%;
-  max-width: 400px; /* Немного увеличена максимальная ширина */
-  margin: 12px 0; /* Увеличен внешний отступ */
-  padding: 16px 18px; /* Увеличены внутренние отступы */
-  border-radius: 10px; /* Увеличен радиус */
+  width: 100%; /* Занимает всю доступную ширину контейнера */
+  margin: 15px 0; /* Увеличен внешний отступ */
+  padding: 18px 20px; /* Увеличены внутренние отступы */
+  border-radius: 12px; /* Увеличен радиус */
   border: 2px solid #d0d4dc; /* Утолщён бордер */
-  font-size: 18px; /* Увеличен размер текста */
+  font-size: 20px; /* Увеличен размер текста */
   transition: all 0.2s ease;
+  box-sizing: border-box; /* Учитываем padding в размере */
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 6px rgba(67,97,238,0.4); /* Увеличена тень */
+  box-shadow: 0 0 8px rgba(67,97,238,0.5); /* Увеличена тень */
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 6px rgba(231,76,60,0.4) !important;
+  box-shadow: 0 0 8px rgba(231,76,60,0.5) !important;
 }
 
 .insight {
-  font-size: 18px; /* Увеличен размер текста */
+  font-size: 20px; /* Увеличен размер текста */
   line-height: 1.6;
-  margin: 25px 0 35px; /* Увеличены отступы */
+  margin: 30px 0 40px; /* Увеличены отступы */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 12px 0; /* Увеличен отступ между элементами списка */
+  margin: 15px 0; /* Увеличен отступ между элементами списка */
   position: relative;
-  padding-left: 24px; /* Увеличен отступ слева */
+  padding-left: 28px; /* Увеличен отступ слева */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 8px; /* Сдвинут маркер */
-  font-size: 18px; /* Увеличен размер маркера */
+  left: 10px; /* Сдвинут маркер */
+  font-size: 20px; /* Увеличен размер маркера */
 }
 
 .message {
-  margin-top: 20px; /* Увеличен отступ */
+  margin-top: 25px; /* Увеличен отступ */
   font-weight: 600;
   display: none;
 }
@@ -124,11 +132,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 15px 0 25px; /* Увеличены отступы */
+  margin: 20px 0 30px; /* Увеличены отступы */
 }
 .cases li {
-  margin: 12px 0; /* Увеличен отступ между элементами */
-  font-size: 18px; /* Увеличен размер текста */
+  margin: 15px 0; /* Увеличен отступ между элементами */
+  font-size: 20px; /* Увеличен размер текста */
   color: #333;
 }
 
@@ -137,33 +145,33 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 16px 28px; /* Увеличены отступы */
-  border-radius: 12px; /* Увеличен радиус */
-  font-weight: 500;
-  font-size: 18px; /* Увеличен размер текста */
+  padding: 18px 32px; /* Увеличены отступы */
+  border-radius: 15px; /* Увеличен радиус */
+  font-weight: 600;
+  font-size: 20px; /* Увеличен размер текста */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  h1 { font-size: 24px; } /* Увеличен минимальный размер */
-  h2 { font-size: 20px; } /* Увеличен минимальный размер */
+  h1 { font-size: 28px; } /* Увеличен минимальный размер */
+  h2 { font-size: 24px; } /* Увеличен минимальный размер */
   .container {
-    padding: 30px; /* Увеличен внутренний отступ */
-    margin: 0 auto 50px auto; /* Увеличен внешний отступ */
+    padding: 40px; /* Увеличен внутренний отступ */
+    min-height: 95vh; /* Почти весь экран */
   }
   button {
-    padding: 16px 22px; /* Увеличены отступы на маленьких экранах */
-    font-size: 16px; /* Немного уменьшен, но всё ещё крупно */
+    padding: 18px 28px; /* Увеличены отступы на маленьких экранах */
+    font-size: 18px; /* Немного уменьшен, но крупно */
   }
   input {
-    padding: 14px 16px; /* Увеличены внутренние отступы */
-    font-size: 16px; /* Увеличен размер текста */
+    padding: 16px 18px; /* Увеличены внутренние отступы */
+    font-size: 18px; /* Увеличен размер текста */
   }
-  .insight { font-size: 16px; } /* Немного уменьшен, но читаем */
-  .cases li { font-size: 16px; } /* Немного уменьшен, но читаем */
+  .insight { font-size: 18px; } /* Немного уменьшен, но читаем */
+  .cases li { font-size: 18px; } /* Немного уменьшен, но читаем */
   .primary-link {
-    padding: 14px 24px; /* Увеличены отступы */
-    font-size: 16px; /* Немного уменьшен, но крупно */
+    padding: 16px 28px; /* Увеличены отступы */
+    font-size: 18px; /* Немного уменьшен, но крупно */
   }
 }
