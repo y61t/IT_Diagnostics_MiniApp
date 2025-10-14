@@ -8,7 +8,7 @@ import urllib.parse
 import json
 
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 
@@ -53,6 +53,19 @@ def validate_init_data(init_data_str: str) -> dict:
         user = json.loads(params['user'])
         return user
     raise ValueError("Invalid init_data hash")
+
+# === Статика ===
+@app.get("/")
+def index():
+    return FileResponse("webapp/index.html")
+
+@app.get("/style.css")
+def css():
+    return FileResponse("webapp/style.css")
+
+@app.get("/script.js")
+def js():
+    return FileResponse("webapp/script.js")
 
 # === Submit формы ===
 @app.post("/submit")
