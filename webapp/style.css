@@ -5,7 +5,7 @@ body {
   text-align: center;
   padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 20px; /* Увеличен базовый размер шрифта */
+  font-size: 24px; /* Увеличен базовый размер шрифта до 24px */
   height: 100vh; /* Занимает всю высоту экрана */
   display: flex;
   flex-direction: column;
@@ -29,39 +29,39 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 32px; /* Увеличен размер заголовка */
-  margin-bottom: 25px;
+  font-size: 38px; /* Увеличен размер заголовка */
+  margin-bottom: 30px;
   color: #2d3e50;
   line-height: 1.4;
 }
 h2 {
-  font-size: 28px; /* Увеличен размер подзаголовка */
-  margin-bottom: 20px;
+  font-size: 34px; /* Увеличен размер подзаголовка */
+  margin-bottom: 25px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 20px; /* Увеличен размер текста */
-  margin-bottom: 35px;
+  font-size: 24px; /* Увеличен размер текста */
+  margin-bottom: 40px;
   line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 20px; /* Увеличен промежуток между кнопками */
+  gap: 25px; /* Увеличен промежуток между кнопками */
 }
 
 button {
   border: none;
-  border-radius: 15px; /* Увеличен радиус */
-  padding: 20px 30px; /* Увеличены внутренние отступы */
-  font-size: 20px; /* Увеличен размер текста */
+  border-radius: 18px; /* Увеличен радиус */
+  padding: 24px 36px; /* Увеличены внутренние отступы */
+  font-size: 24px; /* Увеличен размер текста */
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600; /* Увеличена жирность для читаемости */
 }
-button:hover { transform: translateY(-3px); } /* Увеличен эффект наведения */
+button:hover { transform: translateY(-4px); } /* Увеличен эффект наведения */
 
 button.primary {
   background: #4361ee;
@@ -81,48 +81,48 @@ button.primary:hover {
 
 input {
   width: 100%; /* Занимает всю доступную ширину контейнера */
-  margin: 15px 0; /* Увеличен внешний отступ */
-  padding: 18px 20px; /* Увеличены внутренние отступы */
-  border-radius: 12px; /* Увеличен радиус */
+  margin: 18px 0; /* Увеличен внешний отступ */
+  padding: 22px 24px; /* Увеличены внутренние отступы */
+  border-radius: 15px; /* Увеличен радиус */
   border: 2px solid #d0d4dc; /* Утолщён бордер */
-  font-size: 20px; /* Увеличен размер текста */
+  font-size: 24px; /* Увеличен размер текста */
   transition: all 0.2s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 8px rgba(67,97,238,0.5); /* Увеличена тень */
+  box-shadow: 0 0 10px rgba(67,97,238,0.6); /* Увеличена тень */
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 8px rgba(231,76,60,0.5) !important;
+  box-shadow: 0 0 10px rgba(231,76,60,0.6) !important;
 }
 
 .insight {
-  font-size: 20px; /* Увеличен размер текста */
+  font-size: 24px; /* Увеличен размер текста */
   line-height: 1.6;
-  margin: 30px 0 40px; /* Увеличены отступы */
+  margin: 35px 0 45px; /* Увеличены отступы */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 15px 0; /* Увеличен отступ между элементами списка */
+  margin: 18px 0; /* Увеличен отступ между элементами списка */
   position: relative;
-  padding-left: 28px; /* Увеличен отступ слева */
+  padding-left: 32px; /* Увеличен отступ слева */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 10px; /* Сдвинут маркер */
-  font-size: 20px; /* Увеличен размер маркера */
+  left: 12px; /* Сдвинут маркер */
+  font-size: 24px; /* Увеличен размер маркера */
 }
 
 .message {
-  margin-top: 25px; /* Увеличен отступ */
+  margin-top: 30px; /* Увеличен отступ */
   font-weight: 600;
   display: none;
 }
@@ -132,11 +132,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 20px 0 30px; /* Увеличены отступы */
+  margin: 25px 0 35px; /* Увеличены отступы */
 }
 .cases li {
-  margin: 15px 0; /* Увеличен отступ между элементами */
-  font-size: 20px; /* Увеличен размер текста */
+  margin: 18px 0; /* Увеличен отступ между элементами */
+  font-size: 24px; /* Увеличен размер текста */
   color: #333;
 }
 
@@ -145,33 +145,33 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 18px 32px; /* Увеличены отступы */
-  border-radius: 15px; /* Увеличен радиус */
+  padding: 22px 38px; /* Увеличены отступы */
+  border-radius: 18px; /* Увеличен радиус */
   font-weight: 600;
-  font-size: 20px; /* Увеличен размер текста */
+  font-size: 24px; /* Увеличен размер текста */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  h1 { font-size: 28px; } /* Увеличен минимальный размер */
-  h2 { font-size: 24px; } /* Увеличен минимальный размер */
+  h1 { font-size: 34px; } /* Увеличен минимальный размер */
+  h2 { font-size: 30px; } /* Увеличен минимальный размер */
   .container {
     padding: 40px; /* Увеличен внутренний отступ */
     min-height: 95vh; /* Почти весь экран */
   }
   button {
-    padding: 18px 28px; /* Увеличены отступы на маленьких экранах */
-    font-size: 18px; /* Немного уменьшен, но крупно */
+    padding: 20px 32px; /* Увеличены отступы на маленьких экранах */
+    font-size: 22px; /* Немного уменьшен, но крупно */
   }
   input {
-    padding: 16px 18px; /* Увеличены внутренние отступы */
-    font-size: 18px; /* Увеличен размер текста */
+    padding: 18px 20px; /* Увеличены внутренние отступы */
+    font-size: 22px; /* Увеличен размер текста */
   }
-  .insight { font-size: 18px; } /* Немного уменьшен, но читаем */
-  .cases li { font-size: 18px; } /* Немного уменьшен, но читаем */
+  .insight { font-size: 22px; } /* Немного уменьшен, но читаем */
+  .cases li { font-size: 22px; } /* Немного уменьшен, но читаем */
   .primary-link {
-    padding: 16px 28px; /* Увеличены отступы */
-    font-size: 18px; /* Немного уменьшен, но крупно */
+    padding: 18px 32px; /* Увеличены отступы */
+    font-size: 22px; /* Немного уменьшен, но крупно */
   }
 }
