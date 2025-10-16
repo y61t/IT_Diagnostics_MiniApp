@@ -154,24 +154,29 @@ input.error {
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  h1 { font-size: 34px; } /* Увеличен минимальный размер */
-  h2 { font-size: 30px; } /* Увеличен минимальный размер */
+  body { font-size: 36px; } /* Увеличен в 1.5 раза с 24px до 36px */
+  h1 { font-size: 57px; } /* Увеличен в 1.5 раза с 38px до 57px */
+  h2 { font-size: 51px; } /* Увеличен в 1.5 раза с 34px до 51px */
   .container {
-    padding: 40px; /* Увеличен внутренний отступ */
+    padding: 75px 60px; /* Увеличено в 1.5 раза с 50px/40px */
     min-height: 95vh; /* Почти весь экран */
   }
   button {
-    padding: 20px 32px; /* Увеличены отступы на маленьких экранах */
-    font-size: 22px; /* Немного уменьшен, но крупно */
+    padding: 36px 54px; /* Увеличено в 1.5 раза с 24px/36px */
+    font-size: 36px; /* Увеличен в 1.5 раза с 24px до 36px */
   }
   input {
-    padding: 18px 20px; /* Увеличены внутренние отступы */
-    font-size: 22px; /* Увеличен размер текста */
+    padding: 33px 36px; /* Увеличено в 1.5 раза с 22px/24px */
+    font-size: 36px; /* Увеличен в 1.5 раза с 24px до 36px */
   }
-  .insight { font-size: 22px; } /* Немного уменьшен, но читаем */
-  .cases li { font-size: 22px; } /* Немного уменьшен, но читаем */
+  .insight { font-size: 36px; } /* Увеличен в 1.5 раза с 24px до 36px */
+  .cases li { font-size: 36px; } /* Увеличен в 1.5 раза с 24px до 36px */
   .primary-link {
-    padding: 18px 32px; /* Увеличены отступы */
-    font-size: 22px; /* Немного уменьшен, но крупно */
+    padding: 33px 57px; /* Увеличено в 1.5 раза с 22px/38px */
+    font-size: 36px; /* Увеличен в 1.5 раза с 24px до 36px */
   }
+  .subtitle { font-size: 36px; } /* Увеличен в 1.5 раза с 24px до 36px */
+  .message { font-size: 36px; } /* Увеличен в 1.5 раза с 24px до 36px */
+  /* Убедимся, что прокрутка работает для переполняющегося контента */
+  .container { overflow-y: auto; }
 }
