@@ -5,23 +5,23 @@ body {
   text-align: center;
   padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 22px; /* Уменьшен в 1.5 раза с 32px до 22px для десктопа */
+  font-size: 18px; /* Уменьшен до 18px для лучшей подгонки на десктопе */
   height: 100vh; /* Занимает всю высоту экрана */
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  overflow-y: auto; /* Прокрутка для всего контента */
+  overflow-y: auto; /* Прокрутка для всего контента, если нужно */
 }
 
 .container {
   background: #fff;
-  padding: 53px 47px; /* Уменьшено в 1.5 раза с 80px/70px */
-  border-radius: 23px; /* Уменьшено в 1.5 раза с 35px */
-  box-shadow: 0 10px 27px rgba(0,0,0,0.17); /* Уменьшена тень пропорционально */
+  padding: 40px 35px; /* Уменьшено с 53px/47px для компактности */
+  border-radius: 18px; /* Уменьшено с 23px */
+  box-shadow: 0 8px 20px rgba(0,0,0,0.15); /* Уменьшена тень */
   width: 100%; /* Занимает всю ширину экрана */
   max-width: none; /* Убрано ограничение по ширине */
-  min-height: 90vh; /* Сохранено для прокрутки */
+  min-height: 80vh; /* Уменьшено с 90vh для лучшей подгонки */
   margin: 0; /* Убраны внешние отступы */
   transition: opacity 0.4s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
@@ -31,39 +31,39 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 53px; /* Уменьшен в 1.5 раза с 80px до ~53px */
-  margin-bottom: 33px; /* Уменьшен в 1.5 раза с 50px */
+  font-size: 44px; /* Уменьшен с 53px для лучшей видимости */
+  margin-bottom: 27px; /* Уменьшен с 33px */
   color: #2d3e50;
   line-height: 1.2;
 }
 h2 {
-  font-size: 48px; /* Уменьшен в 1.5 раза с 72px до ~48px */
-  margin-bottom: 30px; /* Уменьшен в 1.5 раза с 45px */
+  font-size: 40px; /* Уменьшен с 48px */
+  margin-bottom: 25px; /* Уменьшен с 30px */
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
-  margin-bottom: 40px; /* Уменьшен в 1.5 раза с 60px */
+  font-size: 26px; /* Уменьшен с 32px */
+  margin-bottom: 33px; /* Уменьшен с 40px */
   line-height: 1.3;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 27px; /* Уменьшен в 1.5 раза с 40px */
+  gap: 22px; /* Уменьшен с 27px */
 }
 
 button {
   border: none;
-  border-radius: 20px; /* Уменьшен в 1.5 раза с 30px */
-  padding: 32px 53px; /* Уменьшено в 1.5 раза с 48px/80px */
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  border-radius: 16px; /* Уменьшен с 20px */
+  padding: 26px 44px; /* Уменьшено с 32px/53px */
+  font-size: 26px; /* Уменьшен с 32px */
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600; /* Сохранена жирность */
 }
-button:hover { transform: translateY(-5px); } /* Уменьшен эффект в 1.5 раза с -8px */
+button:hover { transform: translateY(-4px); } /* Уменьшен с -5px */
 
 button.primary {
   background: #4361ee;
@@ -83,51 +83,51 @@ button.primary:hover {
 
 input {
   width: 100%; /* Занимает всю доступную ширину контейнера */
-  margin: 20px 0; /* Уменьшен в 1.5 раза с 30px */
-  padding: 31px 43px; /* Уменьшено в 1.5 раза с 46px/64px */
-  border-radius: 17px; /* Уменьшен в 1.5 раза с 25px */
-  border: 3px solid #d0d4dc; /* Уменьшен бордер */
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  margin: 16px 0; /* Уменьшен с 20px */
+  padding: 25px 35px; /* Уменьшено с 31px/43px */
+  border-radius: 14px; /* Уменьшен с 17px */
+  border: 2px solid #d0d4dc; /* Уменьшен бордер */
+  font-size: 26px; /* Уменьшен с 32px */
   transition: all 0.2s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 12px rgba(67,97,238,0.6); /* Уменьшена тень */
+  box-shadow: 0 0 10px rgba(67,97,238,0.5); /* Уменьшена тень */
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 12px rgba(231,76,60,0.6) !important;
+  box-shadow: 0 0 10px rgba(231,76,60,0.5) !important;
 }
 
 .insight {
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  font-size: 26px; /* Уменьшен с 32px */
   line-height: 1.3;
-  margin: 37px 0 43px; /* Уменьшено в 1.5 раза с 55px/65px */
+  margin: 30px 0 35px; /* Уменьшено с 37px/43px */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 20px 0; /* Уменьшен в 1.5 раза с 30px */
+  margin: 16px 0; /* Уменьшен с 20px */
   position: relative;
-  padding-left: 33px; /* Уменьшен в 1.5 раза с 50px */
+  padding-left: 27px; /* Уменьшен с 33px */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 13px; /* Уменьшен в 1.5 раза с 20px */
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px */
+  left: 11px; /* Уменьшен с 13px */
+  font-size: 26px; /* Уменьшен с 32px */
 }
 
 .message {
-  margin-top: 33px; /* Уменьшен в 1.5 раза с 50px */
+  margin-top: 27px; /* Уменьшен с 33px */
   font-weight: 600;
   display: none;
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  font-size: 26px; /* Уменьшен с 32px */
 }
 .message.error { color: #e74c3c; }
 .message.success { color: #28a745; }
@@ -135,11 +135,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 27px 0 33px; /* Уменьшено в 1.5 раза с 40px/50px */
+  margin: 22px 0 27px; /* Уменьшено с 27px/33px */
 }
 .cases li {
-  margin: 20px 0; /* Уменьшен в 1.5 раза с 30px */
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  margin: 16px 0; /* Уменьшен с 20px */
+  font-size: 26px; /* Уменьшен с 32px */
   color: #333;
 }
 
@@ -148,10 +148,10 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 31px 53px; /* Уменьшено в 1.5 раза с 46px/80px */
-  border-radius: 20px; /* Уменьшен в 1.5 раза с 30px */
+  padding: 25px 44px; /* Уменьшено с 31px/53px */
+  border-radius: 16px; /* Уменьшен с 20px */
   font-weight: 600;
-  font-size: 32px; /* Уменьшен в 1.5 раза с 48px до ~32px */
+  font-size: 26px; /* Уменьшен с 32px */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
