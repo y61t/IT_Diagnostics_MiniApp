@@ -5,7 +5,7 @@ body {
   text-align: center;
   padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 24px; /* Увеличен базовый размер шрифта до 24px */
+  font-size: 24px; /* Базовый размер шрифта */
   height: 100vh; /* Занимает всю высоту экрана */
   display: flex;
   flex-direction: column;
@@ -154,24 +154,26 @@ input.error {
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  h1 { font-size: 34px; } /* Увеличен минимальный размер */
-  h2 { font-size: 30px; } /* Увеличен минимальный размер */
+  body { font-size: 26px; } /* Увеличен базовый размер шрифта для мобильных */
+  h1 { font-size: 40px; } /* Увеличен минимальный размер */
+  h2 { font-size: 36px; } /* Увеличен минимальный размер */
   .container {
     padding: 40px; /* Увеличен внутренний отступ */
     min-height: 95vh; /* Почти весь экран */
   }
   button {
-    padding: 20px 32px; /* Увеличены отступы на маленьких экранах */
-    font-size: 22px; /* Немного уменьшен, но крупно */
+    padding: 24px 40px; /* Увеличены отступы на маленьких экранах */
+    font-size: 26px; /* Увеличен размер текста */
   }
   input {
-    padding: 18px 20px; /* Увеличены внутренние отступы */
-    font-size: 22px; /* Увеличен размер текста */
+    padding: 22px 28px; /* Увеличены внутренние отступы */
+    font-size: 26px; /* Увеличен размер текста */
   }
-  .insight { font-size: 22px; } /* Немного уменьшен, но читаем */
-  .cases li { font-size: 22px; } /* Немного уменьшен, но читаем */
+  .insight { font-size: 26px; } /* Увеличен размер текста */
+  .cases li { font-size: 26px; } /* Увеличен размер текста */
   .primary-link {
-    padding: 18px 32px; /* Увеличены отступы */
-    font-size: 22px; /* Немного уменьшен, но крупно */
+    padding: 22px 40px; /* Увеличены отступы */
+    font-size: 26px; /* Увеличен размер текста */
   }
+  .subtitle { font-size: 26px; } /* Увеличен размер подзаголовка */
 }
