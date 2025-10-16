@@ -5,7 +5,7 @@ body {
   text-align: center;
   padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 36px; /* Максимальный базовый размер шрифта для десктопа */
+  font-size: 48px; /* Максимальный базовый размер шрифта для десктопа */
   height: 100vh; /* Занимает всю высоту экрана */
   display: flex;
   flex-direction: column;
@@ -16,9 +16,9 @@ body {
 
 .container {
   background: #fff;
-  padding: 80px 70px; /* Максимальные внутренние отступы */
-  border-radius: 35px; /* Увеличен радиус */
-  box-shadow: 0 15px 40px rgba(0,0,0,0.25); /* Усилена тень */
+  padding: 100px 90px; /* Максимальные внутренние отступы */
+  border-radius: 40px; /* Увеличен радиус */
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3); /* Усилена тень */
   width: 100%; /* Занимает всю ширину экрана */
   max-width: none; /* Убрано ограничение по ширине */
   min-height: 100vh; /* Занимает 100% высоты экрана */
@@ -31,39 +31,39 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 72px; /* Максимальный размер заголовка */
-  margin-bottom: 50px;
+  font-size: 100px; /* Абсолютный максимум для заголовка */
+  margin-bottom: 60px;
   color: #2d3e50;
-  line-height: 1.2;
+  line-height: 1.1;
 }
 h2 {
-  font-size: 68px; /* Максимальный размер подзаголовка */
-  margin-bottom: 45px;
+  font-size: 90px; /* Абсолютный максимум для подзаголовка */
+  margin-bottom: 55px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 48px; /* Максимальный размер текста */
-  margin-bottom: 60px;
-  line-height: 1.3;
+  font-size: 60px; /* Абсолютный максимум для текста */
+  margin-bottom: 70px;
+  line-height: 1.2;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 40px; /* Максимальный промежуток между кнопками */
+  gap: 50px; /* Максимальный промежуток между кнопками */
 }
 
 button {
   border: none;
-  border-radius: 30px; /* Максимальный радиус */
-  padding: 48px 80px; /* Максимальные внутренние отступы */
-  font-size: 48px; /* Максимальный размер текста */
+  border-radius: 35px; /* Абсолютный максимум радиуса */
+  padding: 60px 100px; /* Абсолютные максимальные внутренние отступы */
+  font-size: 60px; /* Абсолютный максимум размера текста */
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600; /* Максимальная жирность */
 }
-button:hover { transform: translateY(-8px); } /* Максимальный эффект наведения */
+button:hover { transform: translateY(-10px); } /* Абсолютный максимум эффекта наведения */
 
 button.primary {
   background: #4361ee;
@@ -83,51 +83,51 @@ button.primary:hover {
 
 input {
   width: 100%; /* Занимает всю доступную ширину контейнера */
-  margin: 30px 0; /* Максимальный внешний отступ */
-  padding: 46px 64px; /* Максимальные внутренние отступы */
-  border-radius: 25px; /* Максимальный радиус */
-  border: 4px solid #d0d4dc; /* Максимально утолщённый бордер */
-  font-size: 48px; /* Максимальный размер текста */
+  margin: 40px 0; /* Абсолютный максимум внешнего отступа */
+  padding: 58px 80px; /* Абсолютные максимальные внутренние отступы */
+  border-radius: 30px; /* Абсолютный максимум радиуса */
+  border: 5px solid #d0d4dc; /* Абсолютно утолщённый бордер */
+  font-size: 60px; /* Абсолютный максимум размера текста */
   transition: all 0.2s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 18px rgba(67,97,238,0.9); /* Максимальная тень */
+  box-shadow: 0 0 20px rgba(67,97,238,0.95); /* Абсолютная максимальная тень */
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 18px rgba(231,76,60,0.9) !important;
+  box-shadow: 0 0 20px rgba(231,76,60,0.95) !important;
 }
 
 .insight {
-  font-size: 48px; /* Максимальный размер текста */
-  line-height: 1.3;
-  margin: 55px 0 65px; /* Максимальные отступы */
+  font-size: 60px; /* Абсолютный максимум размера текста */
+  line-height: 1.2;
+  margin: 65px 0 75px; /* Абсолютные максимальные отступы */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 30px 0; /* Максимальный отступ между элементами списка */
+  margin: 40px 0; /* Абсолютный максимум отступа между элементами списка */
   position: relative;
-  padding-left: 50px; /* Максимальный отступ слева */
+  padding-left: 60px; /* Абсолютный максимум отступа слева */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 20px; /* Максимально сдвинутый маркер */
-  font-size: 48px; /* Максимальный размер маркера */
+  left: 24px; /* Абсолютно сдвинутый маркер */
+  font-size: 60px; /* Абсолютный максимум размера маркера */
 }
 
 .message {
-  margin-top: 50px; /* Максимальный отступ */
+  margin-top: 60px; /* Абсолютный максимум отступа */
   font-weight: 600;
   display: none;
-  font-size: 48px; /* Максимальный размер текста */
+  font-size: 60px; /* Абсолютный максимум размера текста */
 }
 .message.error { color: #e74c3c; }
 .message.success { color: #28a745; }
@@ -135,11 +135,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 40px 0 50px; /* Максимальные отступы */
+  margin: 50px 0 60px; /* Абсолютные максимальные отступы */
 }
 .cases li {
-  margin: 30px 0; /* Максимальный отступ между элементами */
-  font-size: 48px; /* Максимальный размер текста */
+  margin: 40px 0; /* Абсолютный максимум отступа между элементами */
+  font-size: 60px; /* Абсолютный максимум размера текста */
   color: #333;
 }
 
@@ -148,37 +148,37 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 46px 80px; /* Максимальные отступы */
-  border-radius: 30px; /* Максимальный радиус */
+  padding: 58px 100px; /* Абсолютные максимальные отступы */
+  border-radius: 35px; /* Абсолютный максимум радиуса */
   font-weight: 600;
-  font-size: 48px; /* Максимальный размер текста */
+  font-size: 60px; /* Абсолютный максимум размера текста */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  body { font-size: 48px; } /* Максимальный базовый размер шрифта для мобильных */
-  h1 { font-size: 80px; } /* Максимальный размер для маленьких экранов */
-  h2 { font-size: 76px; } /* Максимальный размер для маленьких экранов */
+  body { font-size: 60px; } /* Абсолютный максимум базового размера шрифта для мобильных */
+  h1 { font-size: 100px; } /* Абсолютный максимум для маленьких экранов */
+  h2 { font-size: 96px; } /* Абсолютный максимум для маленьких экранов */
   .container {
-    padding: 70px; /* Максимальный внутренний отступ */
+    padding: 80px; /* Абсолютный максимальный внутренний отступ */
     min-height: 100vh; /* Занимает весь экран */
   }
   button {
-    padding: 50px 90px; /* Максимальные отступы на маленьких экранах */
-    font-size: 48px; /* Максимальный размер текста */
+    padding: 60px 110px; /* Абсолютные максимальные отступы на маленьких экранах */
+    font-size: 60px; /* Абсолютный максимум размера текста */
   }
   input {
-    padding: 48px 72px; /* Максимальные внутренние отступы */
-    font-size: 48px; /* Максимальный размер текста */
+    padding: 58px 88px; /* Абсолютные максимальные внутренние отступы */
+    font-size: 60px; /* Абсолютный максимум размера текста */
   }
-  .insight { font-size: 48px; } /* Максимальный размер текста */
-  .cases li { font-size: 48px; } /* Максимальный размер текста */
+  .insight { font-size: 60px; } /* Абсолютный максимум размера текста */
+  .cases li { font-size: 60px; } /* Абсолютный максимум размера текста */
   .primary-link {
-    padding: 48px 90px; /* Максимальные отступы */
-    font-size: 48px; /* Максимальный размер текста */
+    padding: 58px 110px; /* Абсолютные максимальные отступы */
+    font-size: 60px; /* Абсолютный максимум размера текста */
   }
-  .subtitle { font-size: 48px; } /* Максимальный размер подзаголовка */
+  .subtitle { font-size: 60px; } /* Абсолютный максимум размера подзаголовка */
   /* Убедимся, что прокрутка работает */
   .container { overflow-y: auto; }
 }
