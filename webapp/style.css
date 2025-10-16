@@ -161,21 +161,21 @@ input.error {
   h1 { font-size: 120px; } /* Увеличен в 1.5 раза с 80px до 120px */
   h2 { font-size: 108px; } /* Увеличен в 1.5 раза с 72px до ~108px */
   .container {
-    padding: 120px 105px; /* Увеличено в 1.5 раза с 80px/70px */
+    padding: 90px 75px; /* Увеличено в 1.5 раза с 60px/50px */
     min-height: 90vh; /* Сохранено для прокрутки */
   }
   button {
-    padding: 60px 165px; /* Увеличено в 1.5 раза с 40px/110px */
+    padding: 60px 105px; /* Увеличено в 1.5 раза с 40px/70px */
     font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
   }
   input {
-    padding: 57px 132px; /* Увеличено в 1.5 раза с 38px/88px */
+    padding: 57px 84px; /* Увеличено в 1.5 раза с 38px/56px */
     font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
   }
   .insight { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
   .cases li { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
   .primary-link {
-    padding: 57px 165px; /* Увеличено в 1.5 раза с 38px/110px */
+    padding: 57px 105px; /* Увеличено в 1.5 раза с 38px/70px */
     font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
   }
   .subtitle { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
