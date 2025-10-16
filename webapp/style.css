@@ -3,67 +3,57 @@ body {
   background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
   color: #1e1e2d;
   text-align: center;
-  padding: 0; /* Убрали отступы, чтобы занять весь экран */
+  padding: 40px 20px;
   margin: 0;
-  font-size: 16px; /* Уменьшен до 16px для лучшей подгонки на десктопе */
-  height: 100vh; /* Занимает всю высоту экрана */
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  overflow-y: auto; /* Прокрутка, если контент превышает */
+  font-size: 18px; /* Увеличен базовый размер шрифта */
 }
 
 .container {
   background: #fff;
-  padding: 30px 25px; /* Уменьшено с 40px/35px для компактности */
-  border-radius: 15px; /* Уменьшено с 18px */
-  box-shadow: 0 6px 15px rgba(0,0,0,0.12); /* Уменьшена тень */
-  width: 100%; /* Занимает всю ширину экрана */
-  max-width: none; /* Убрано ограничение по ширине */
-  min-height: 70vh; /* Уменьшено с 80vh для лучшей подгонки */
-  margin: 0; /* Убраны внешние отступы */
+  padding: 40px 30px; /* Увеличен внутренний отступ */
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+  max-width: 520px;
+  margin: 0 auto 40px auto; /* Увеличен внешний отступ */
   transition: opacity 0.4s ease;
-  box-sizing: border-box; /* Учитываем padding в размере */
-  overflow-y: auto; /* Прокрутка внутри контейнера */
 }
 
 .hidden { display: none; }
 
 h1 {
-  font-size: 38px; /* Уменьшен с 44px */
-  margin-bottom: 20px; /* Уменьшен с 27px */
+  font-size: 28px; /* Увеличен размер заголовка */
+  margin-bottom: 20px;
   color: #2d3e50;
-  line-height: 1.2;
+  line-height: 1.4;
 }
 h2 {
-  font-size: 34px; /* Уменьшен с 40px */
-  margin-bottom: 18px; /* Уменьшен с 25px */
+  font-size: 24px; /* Увеличен размер подзаголовка */
+  margin-bottom: 16px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 22px; /* Уменьшен с 26px */
-  margin-bottom: 25px; /* Уменьшен с 33px */
-  line-height: 1.3;
+  font-size: 18px; /* Увеличен размер текста */
+  margin-bottom: 30px;
+  line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* Уменьшен с 22px */
+  gap: 16px; /* Увеличен промежуток между кнопками */
 }
 
 button {
   border: none;
-  border-radius: 12px; /* Уменьшен с 16px */
-  padding: 20px 35px; /* Уменьшено с 26px/44px */
-  font-size: 22px; /* Уменьшен с 26px */
+  border-radius: 12px; /* Немного увеличен радиус */
+  padding: 18px 24px; /* Увеличены внутренние отступы */
+  font-size: 18px; /* Увеличен размер текста */
   cursor: pointer;
   transition: all 0.25s ease;
-  font-weight: 600; /* Сохранена жирность */
+  font-weight: 500;
 }
-button:hover { transform: translateY(-3px); } /* Уменьшен с -4px */
+button:hover { transform: translateY(-2px); } /* Увеличен эффект наведения */
 
 button.primary {
   background: #4361ee;
@@ -82,52 +72,51 @@ button.primary:hover {
 }
 
 input {
-  width: 100%; /* Занимает всю доступную ширину контейнера */
-  margin: 12px 0; /* Уменьшен с 16px */
-  padding: 20px 28px; /* Уменьшено с 25px/35px */
-  border-radius: 11px; /* Уменьшен с 14px */
-  border: 2px solid #d0d4dc; /* Уменьшен бордер */
-  font-size: 22px; /* Уменьшен с 26px */
+  width: 90%;
+  max-width: 400px; /* Немного увеличена максимальная ширина */
+  margin: 12px 0; /* Увеличен внешний отступ */
+  padding: 16px 18px; /* Увеличены внутренние отступы */
+  border-radius: 10px; /* Увеличен радиус */
+  border: 2px solid #d0d4dc; /* Утолщён бордер */
+  font-size: 18px; /* Увеличен размер текста */
   transition: all 0.2s ease;
-  box-sizing: border-box; /* Учитываем padding в размере */
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 8px rgba(67,97,238,0.4); /* Уменьшена тень */
+  box-shadow: 0 0 6px rgba(67,97,238,0.4); /* Увеличена тень */
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 8px rgba(231,76,60,0.4) !important;
+  box-shadow: 0 0 6px rgba(231,76,60,0.4) !important;
 }
 
 .insight {
-  font-size: 22px; /* Уменьшен с 26px */
-  line-height: 1.3;
-  margin: 22px 0 27px; /* Уменьшено с 30px/35px */
+  font-size: 18px; /* Увеличен размер текста */
+  line-height: 1.6;
+  margin: 25px 0 35px; /* Увеличены отступы */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 12px 0; /* Уменьшен с 16px */
+  margin: 12px 0; /* Увеличен отступ между элементами списка */
   position: relative;
-  padding-left: 20px; /* Уменьшен с 27px */
+  padding-left: 24px; /* Увеличен отступ слева */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 8px; /* Уменьшен с 11px */
-  font-size: 22px; /* Уменьшен с 26px */
+  left: 8px; /* Сдвинут маркер */
+  font-size: 18px; /* Увеличен размер маркера */
 }
 
 .message {
-  margin-top: 20px; /* Уменьшен с 27px */
+  margin-top: 20px; /* Увеличен отступ */
   font-weight: 600;
   display: none;
-  font-size: 22px; /* Уменьшен с 26px */
 }
 .message.error { color: #e74c3c; }
 .message.success { color: #28a745; }
@@ -135,11 +124,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 16px 0 20px; /* Уменьшено с 22px/27px */
+  margin: 15px 0 25px; /* Увеличены отступы */
 }
 .cases li {
-  margin: 12px 0; /* Уменьшен с 16px */
-  font-size: 22px; /* Уменьшен с 26px */
+  margin: 12px 0; /* Увеличен отступ между элементами */
+  font-size: 18px; /* Увеличен размер текста */
   color: #333;
 }
 
@@ -148,37 +137,33 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 20px 35px; /* Уменьшено с 25px/44px */
-  border-radius: 12px; /* Уменьшен с 16px */
-  font-weight: 600;
-  font-size: 22px; /* Уменьшен с 26px */
+  padding: 16px 28px; /* Увеличены отступы */
+  border-radius: 12px; /* Увеличен радиус */
+  font-weight: 500;
+  font-size: 18px; /* Увеличен размер текста */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  body { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
-  h1 { font-size: 120px; } /* Увеличен в 1.5 раза с 80px до 120px */
-  h2 { font-size: 108px; } /* Увеличен в 1.5 раза с 72px до ~108px */
+  h1 { font-size: 24px; } /* Увеличен минимальный размер */
+  h2 { font-size: 20px; } /* Увеличен минимальный размер */
   .container {
-    padding: 90px 75px; /* Увеличено в 1.5 раза с 60px/50px */
-    min-height: 90vh; /* Сохранено для прокрутки */
+    padding: 30px; /* Увеличен внутренний отступ */
+    margin: 0 auto 50px auto; /* Увеличен внешний отступ */
   }
   button {
-    padding: 60px 105px; /* Увеличено в 1.5 раза с 40px/70px */
-    font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
+    padding: 16px 22px; /* Увеличены отступы на маленьких экранах */
+    font-size: 16px; /* Немного уменьшен, но всё ещё крупно */
   }
   input {
-    padding: 57px 84px; /* Увеличено в 1.5 раза с 38px/56px */
-    font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
+    padding: 14px 16px; /* Увеличены внутренние отступы */
+    font-size: 16px; /* Увеличен размер текста */
   }
-  .insight { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
-  .cases li { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
+  .insight { font-size: 16px; } /* Немного уменьшен, но читаем */
+  .cases li { font-size: 16px; } /* Немного уменьшен, но читаем */
   .primary-link {
-    padding: 57px 105px; /* Увеличено в 1.5 раза с 38px/70px */
-    font-size: 72px; /* Увеличен в 1.5 раза с 48px до 72px */
+    padding: 14px 24px; /* Увеличены отступы */
+    font-size: 16px; /* Немного уменьшен, но крупно */
   }
-  .subtitle { font-size: 72px; } /* Увеличен в 1.5 раза с 48px до 72px */
-  /* Убедимся, что прокрутка работает */
-  .container { overflow-y: auto; }
 }
