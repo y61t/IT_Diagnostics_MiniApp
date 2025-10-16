@@ -5,7 +5,7 @@ body {
   text-align: center;
   padding: 0; /* Убрали отступы, чтобы занять весь экран */
   margin: 0;
-  font-size: 24px; /* Базовый размер шрифта */
+  font-size: 24px; /* Базовый размер шрифта для десктопа */
   height: 100vh; /* Занимает всю высоту экрана */
   display: flex;
   flex-direction: column;
@@ -24,6 +24,7 @@ body {
   margin: 0; /* Убраны внешние отступы */
   transition: opacity 0.4s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
+  overflow-y: auto; /* Добавлена прокрутка, если контент не помещается */
 }
 
 .hidden { display: none; }
@@ -154,26 +155,28 @@ input.error {
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  body { font-size: 26px; } /* Увеличен базовый размер шрифта для мобильных */
-  h1 { font-size: 40px; } /* Увеличен минимальный размер */
-  h2 { font-size: 36px; } /* Увеличен минимальный размер */
+  body { font-size: 30px; } /* Увеличен базовый размер шрифта для мобильных до 30px */
+  h1 { font-size: 46px; } /* Увеличен минимальный размер */
+  h2 { font-size: 42px; } /* Увеличен минимальный размер */
   .container {
     padding: 40px; /* Увеличен внутренний отступ */
     min-height: 95vh; /* Почти весь экран */
   }
   button {
-    padding: 24px 40px; /* Увеличены отступы на маленьких экранах */
-    font-size: 26px; /* Увеличен размер текста */
+    padding: 28px 48px; /* Увеличены отступы на маленьких экранах */
+    font-size: 30px; /* Увеличен размер текста */
   }
   input {
-    padding: 22px 28px; /* Увеличены внутренние отступы */
-    font-size: 26px; /* Увеличен размер текста */
+    padding: 26px 32px; /* Увеличены внутренние отступы */
+    font-size: 30px; /* Увеличен размер текста */
   }
-  .insight { font-size: 26px; } /* Увеличен размер текста */
-  .cases li { font-size: 26px; } /* Увеличен размер текста */
+  .insight { font-size: 30px; } /* Увеличен размер текста */
+  .cases li { font-size: 30px; } /* Увеличен размер текста */
   .primary-link {
-    padding: 22px 40px; /* Увеличены отступы */
-    font-size: 26px; /* Увеличен размер текста */
+    padding: 26px 48px; /* Увеличены отступы */
+    font-size: 30px; /* Увеличен размер текста */
   }
-  .subtitle { font-size: 26px; } /* Увеличен размер подзаголовка */
+  .subtitle { font-size: 30px; } /* Увеличен размер подзаголовка */
+  /* Добавлена прокрутка, если контент не помещается */
+  .container { overflow-y: auto; }
 }
