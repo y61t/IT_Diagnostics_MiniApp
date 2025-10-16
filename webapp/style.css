@@ -21,7 +21,7 @@ body {
   box-shadow: 0 15px 40px rgba(0,0,0,0.25); /* Восстановлена тень */
   width: 100%; /* Занимает всю ширину экрана */
   max-width: none; /* Убрано ограничение по ширине */
-  min-height: 100vh; /* Занимает 100% высоты экрана */
+  min-height: 90vh; /* Уменьшено до 90%, чтобы дать место прокрутке */
   margin: 0; /* Убраны внешние отступы */
   transition: opacity 0.4s ease;
   box-sizing: border-box; /* Учитываем padding в размере */
@@ -157,28 +157,28 @@ input.error {
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  body { font-size: 60px; } /* Восстановлен максимум для мобильных */
-  h1 { font-size: 100px; } /* Восстановлен максимум */
-  h2 { font-size: 96px; } /* Восстановлен максимум */
+  body { font-size: 48px; } /* Уменьшен до 48px для лучшей подгонки */
+  h1 { font-size: 80px; } /* Уменьшен до 80px, чтобы помещался */
+  h2 { font-size: 72px; } /* Уменьшен до 72px */
   .container {
-    padding: 80px; /* Восстановлен максимальный внутренний отступ */
-    min-height: 100vh; /* Восстановлен весь экран */
+    padding: 60px 50px; /* Уменьшены внутренние отступы для мобильных */
+    min-height: 90vh; /* Уменьшено для прокрутки */
   }
   button {
-    padding: 60px 110px; /* Восстановлены максимальные отступы */
-    font-size: 60px; /* Восстановлен максимум */
+    padding: 40px 70px; /* Уменьшены отступы */
+    font-size: 48px; /* Уменьшен до 48px */
   }
   input {
-    padding: 58px 88px; /* Восстановлены максимальные внутренние отступы */
-    font-size: 60px; /* Восстановлен максимум */
+    padding: 38px 56px; /* Уменьшены внутренние отступы */
+    font-size: 48px; /* Уменьшен до 48px */
   }
-  .insight { font-size: 60px; } /* Восстановлен максимум */
-  .cases li { font-size: 60px; } /* Восстановлен максимум */
+  .insight { font-size: 48px; } /* Уменьшен до 48px */
+  .cases li { font-size: 48px; } /* Уменьшен до 48px */
   .primary-link {
-    padding: 58px 110px; /* Восстановлены максимальные отступы */
-    font-size: 60px; /* Восстановлен максимум */
+    padding: 38px 70px; /* Уменьшены отступы */
+    font-size: 48px; /* Уменьшен до 48px */
   }
-  .subtitle { font-size: 60px; } /* Восстановлен максимум */
+  .subtitle { font-size: 48px; } /* Уменьшен до 48px */
   /* Убедимся, что прокрутка работает */
   .container { overflow-y: auto; }
 }
