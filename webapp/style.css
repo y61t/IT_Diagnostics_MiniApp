@@ -1,3 +1,8 @@
+/* 🔧 Базовая адаптация под все экраны */
+html {
+  font-size: clamp(18px, 2.3vw, 24px);
+}
+
 body {
   font-family: "Inter", Arial, sans-serif;
   background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
@@ -5,7 +10,7 @@ body {
   text-align: center;
   padding: 0;
   margin: 0;
-  font-size: 24px;
+  font-size: 1rem; /* теперь гибкий размер */
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -29,19 +34,19 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 38px;
+  font-size: 2.4rem;
   margin-bottom: 30px;
   color: #2d3e50;
   line-height: 1.4;
 }
 h2 {
-  font-size: 34px;
+  font-size: 2.1rem;
   margin-bottom: 25px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 24px;
+  font-size: 1rem;
   margin-bottom: 40px;
   line-height: 1.6;
 }
@@ -56,7 +61,7 @@ button {
   border: none;
   border-radius: 18px;
   padding: 24px 36px;
-  font-size: 24px;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600;
@@ -85,7 +90,7 @@ input {
   padding: 22px 24px;
   border-radius: 15px;
   border: 2px solid #d0d4dc;
-  font-size: 24px;
+  font-size: 1rem;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -101,7 +106,7 @@ input.error {
 }
 
 .insight {
-  font-size: 24px;
+  font-size: 1rem;
   line-height: 1.6;
   margin: 35px 0 45px;
   color: #333;
@@ -118,7 +123,7 @@ input.error {
   color: #4361ee;
   position: absolute;
   left: 12px;
-  font-size: 24px;
+  font-size: 1rem;
 }
 
 .message {
@@ -136,7 +141,7 @@ input.error {
 }
 .cases li {
   margin: 18px 0;
-  font-size: 24px;
+  font-size: 1rem;
   color: #333;
 }
 
@@ -148,30 +153,27 @@ input.error {
   padding: 22px 38px;
   border-radius: 18px;
   font-weight: 600;
-  font-size: 24px;
+  font-size: 1rem;
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
+/* 📱 Мобильная адаптация под Telegram WebApp */
 @media (max-width: 480px) {
-  h1 { font-size: 34px; }
-  h2 { font-size: 30px; }
+  html {
+    font-size: 22px; /* немного увеличим масштаб текста */
+  }
+  h1 { font-size: 2.6rem; }
+  h2 { font-size: 2.2rem; }
   .container {
-    padding: 40px;
+    padding: 36px 28px;
     min-height: 95vh;
   }
-  button {
-    padding: 20px 32px;
-    font-size: 22px;
+  button, input, .primary-link {
+    font-size: 1.1rem;
+    padding: 20px 30px;
   }
-  input {
-    padding: 18px 20px;
-    font-size: 22px;
-  }
-  .insight { font-size: 22px; }
-  .cases li { font-size: 22px; }
-  .primary-link {
-    padding: 18px 32px;
-    font-size: 22px;
+  .insight, .cases li {
+    font-size: 1.1rem;
   }
 }
