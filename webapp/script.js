@@ -18,6 +18,33 @@ if (window.Telegram && window.Telegram.WebApp) {
   console.log("Telegram WebApp not detected. Testing outside Telegram?");
 }
 
+// Динамическое увеличение шрифта на мобильных устройствах (для экранов <= 768px)
+function adjustFontSize() {
+  if (window.innerWidth <= 768) {
+    const root = document.documentElement;
+    root.style.fontSize = window.innerWidth + 'px'; // Базовый размер ~ ширине экрана (одна буква на весь экран)
+    document.body.style.lineHeight = '1';
+
+    // Корректировка для ключевых элементов (чтобы они были пропорциональными, но огромными)
+    document.querySelectorAll('h1, h2, .subtitle, button, input, .insight li, .cases li, .primary-link, .message').forEach(el => {
+      el.style.fontSize = '1rem';
+      el.style.lineHeight = '1';
+      el.style.margin = '0.05rem 0';
+      el.style.padding = '0.05rem';
+    });
+
+    // Минимизация отступов в контейнере и списках
+    document.querySelectorAll('.container, ul').forEach(el => {
+      el.style.padding = '0.05rem';
+      el.style.margin = '0.05rem';
+    });
+  }
+}
+
+// Вызываем при загрузке и при ресайзе
+window.addEventListener('load', adjustFontSize);
+window.addEventListener('resize', adjustFontSize);
+
 // Тексты инсайтов и чек-листов
 const insights = {
   1: {
