@@ -1,5 +1,5 @@
 html {
-  font-size: 16px; /* Базовый размер шрифта для rem */
+  font-size: 16px; /* Базовый размер для десктопа */
 }
 
 body {
@@ -9,7 +9,7 @@ body {
   text-align: center;
   padding: 0;
   margin: 0;
-  font-size: 1.5rem; /* 24px при базовом 16px */
+  font-size: 24px;
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -19,7 +19,7 @@ body {
 
 .container {
   background: #fff;
-  padding: 3.125rem 2.5rem; /* 50px 40px */
+  padding: 50px 40px;
   border-radius: 20px;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
@@ -33,34 +33,34 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 2.375rem; /* 38px */
-  margin-bottom: 1.875rem; /* 30px */
+  font-size: 38px;
+  margin-bottom: 30px;
   color: #2d3e50;
   line-height: 1.4;
 }
 h2 {
-  font-size: 2.125rem; /* 34px */
-  margin-bottom: 1.5625rem; /* 25px */
+  font-size: 34px;
+  margin-bottom: 25px;
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 1.5rem; /* 24px */
-  margin-bottom: 2.5rem; /* 40px */
+  font-size: 24px;
+  margin-bottom: 40px;
   line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1.5625rem; /* 25px */
+  gap: 25px;
 }
 
 button {
   border: none;
   border-radius: 18px;
-  padding: 1.5rem 2.25rem; /* 24px 36px */
-  font-size: 1.5rem; /* 24px */
+  padding: 24px 36px;
+  font-size: 24px;
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600;
@@ -85,11 +85,11 @@ button.primary:hover {
 
 input {
   width: 100%;
-  margin: 1.125rem 0; /* 18px */
-  padding: 1.375rem 1.5rem; /* 22px 24px */
+  margin: 18px 0;
+  padding: 22px 24px;
   border-radius: 15px;
   border: 2px solid #d0d4dc;
-  font-size: 1.5rem; /* 24px */
+  font-size: 24px;
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
@@ -105,28 +105,28 @@ input.error {
 }
 
 .insight {
-  font-size: 1.5rem; /* 24px */
+  font-size: 24px;
   line-height: 1.6;
-  margin: 2.1875rem 0 2.8125rem; /* 35px 45px */
+  margin: 35px 0 45px;
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 1.125rem 0; /* 18px */
+  margin: 18px 0;
   position: relative;
-  padding-left: 2rem; /* 32px */
+  padding-left: 32px;
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 0.75rem; /* 12px */
-  font-size: 1.5rem; /* 24px */
+  left: 12px;
+  font-size: 24px;
 }
 
 .message {
-  margin-top: 1.875rem; /* 30px */
+  margin-top: 30px;
   font-weight: 600;
   display: none;
 }
@@ -136,11 +136,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 1.5625rem 0 2.1875rem; /* 25px 35px */
+  margin: 25px 0 35px;
 }
 .cases li {
-  margin: 1.125rem 0; /* 18px */
-  font-size: 1.5rem; /* 24px */
+  margin: 18px 0;
+  font-size: 24px;
   color: #333;
 }
 
@@ -149,36 +149,61 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 1.375rem 2.375rem; /* 22px 38px */
+  padding: 22px 38px;
   border-radius: 18px;
   font-weight: 600;
-  font-size: 1.5rem; /* 24px */
+  font-size: 24px;
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 768px) {
   html {
-    font-size: 18px; /* Увеличиваем базовый размер для мобильных */
+    font-size: 20px !important; /* Увеличиваем базовый размер для мобильных */
   }
-  h1 { font-size: 2rem; /* ~36px при 18px базовом */ }
-  h2 { font-size: 1.777rem; /* ~32px */ }
+  body {
+    font-size: 1.6rem !important; /* ~32px */
+  }
+  h1 {
+    font-size: 2.4rem !important; /* ~48px */
+  }
+  h2 {
+    font-size: 2.1rem !important; /* ~42px */
+  }
+  .subtitle {
+    font-size: 1.5rem !important; /* ~30px */
+  }
   .container {
-    padding: 2.5rem; /* 40px */
+    padding: 3rem !important; /* ~60px */
     min-height: 95vh;
   }
   button {
-    padding: 1.25rem 2rem; /* 22.5px 36px */
-    font-size: 1.333rem; /* ~24px */
+    padding: 1.6rem 2.4rem !important; /* ~32px 48px */
+    font-size: 1.5rem !important; /* ~30px */
+    border-radius: 22px !important;
   }
   input {
-    padding: 1.111rem 1.333rem; /* ~20px 24px */
-    font-size: 1.333rem; /* ~24px */
+    padding: 1.5rem 1.6rem !important; /* ~30px 32px */
+    font-size: 1.5rem !important; /* ~30px */
+    border-radius: 18px !important;
   }
-  .insight { font-size: 1.333rem; /* ~24px */ }
-  .cases li { font-size: 1.333rem; /* ~24px */ }
+  .insight {
+    font-size: 1.5rem !important; /* ~30px */
+    margin: 2.5rem 0 3.2rem !important; /* ~50px 64px */
+  }
+  .insight li {
+    padding-left: 2.2rem !important; /* ~44px */
+  }
+  .insight li::before {
+    left: 0.8rem !important; /* ~16px */
+    font-size: 1.5rem !important; /* ~30px */
+  }
+  .cases li {
+    font-size: 1.5rem !important; /* ~30px */
+  }
   .primary-link {
-    padding: 1.111rem 2rem; /* ~20px 36px */
-    font-size: 1.333rem; /* ~24px */
+    padding: 1.5rem 2.4rem !important; /* ~30px 48px */
+    font-size: 1.5rem !important; /* ~30px */
+    border-radius: 22px !important;
   }
 }
