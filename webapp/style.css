@@ -1,76 +1,73 @@
 html {
-  font-size: 16px; /* Базовый размер шрифта для компьютеров */
+  font-size: clamp(14px, 2.5vw, 16px);
 }
 
 body {
   font-family: "Inter", Arial, sans-serif;
   background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
   color: #1e1e2d;
-  text-align: center;
-  padding: 0;
   margin: 0;
-  font-size: 1.5rem; /* 24px при базовом размере 16px */
-  height: 100vh;
+  font-size: 1.25rem;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
 }
 
 .container {
   background: #fff;
-  padding: 3.125rem 2.5rem; /* 50px 40px */
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: none;
-  min-height: 90vh;
-  margin: 0;
-  transition: opacity 0.4s ease;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  width: min(90%, 40rem);
   box-sizing: border-box;
 }
 
 .hidden { display: none; }
 
 h1 {
-  font-size: 2.375rem; /* 38px */
-  margin-bottom: 1.875rem; /* 30px */
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
   color: #2d3e50;
-  line-height: 1.4;
 }
+
 h2 {
-  font-size: 2.125rem; /* 34px */
-  margin-bottom: 1.5625rem; /* 25px */
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
   color: #2d3e50;
 }
+
 .subtitle {
   color: #555;
-  font-size: 1.5rem; /* 24px */
-  margin-bottom: 2.5rem; /* 40px */
-  line-height: 1.6;
+  font-size: 1rem;
+  margin-bottom: 1rem;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 1.5625rem; /* 25px */
+  gap: 0.75rem;
 }
 
 button {
   border: none;
-  border-radius: 18px;
-  padding: 1.5rem 2.25rem; /* 24px 36px */
-  font-size: 1.5rem; /* 24px */
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: all 0.25s ease;
+  transition: all 0.2s;
   font-weight: 600;
 }
-button:hover { transform: translateY(-4px); }
+
+button:hover {
+  transform: translateY(-0.125rem);
+}
 
 button.primary {
   background: #4361ee;
-  color: white;
+  color: #fff;
 }
+
 button.primary:hover {
   background: #3651d6;
 }
@@ -79,120 +76,119 @@ button.primary:hover {
   background: #f2f4f8;
   color: #222;
 }
+
 #scenario-buttons button:hover {
   background: #e2e6ee;
 }
 
 input {
   width: 100%;
-  margin: 1.125rem 0; /* 18px */
-  padding: 1.375rem 1.5rem; /* 22px 24px */
-  border-radius: 15px;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
   border: 2px solid #d0d4dc;
-  font-size: 1.5rem; /* 24px */
-  transition: all 0.2s ease;
+  font-size: 1rem;
+  transition: all 0.2s;
   box-sizing: border-box;
 }
+
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
 }
 
 input.error {
-  border-color: #e74c3c !important;
-  box-shadow: 0 0 10px rgba(231, 76, 60, 0.6) !important;
+  border-color: #e74c3c;
 }
 
 .insight {
-  font-size: 1.5rem; /* 24px */
-  line-height: 1.6;
-  margin: 2.1875rem 0 2.8125rem; /* 35px 45px */
+  font-size: 1rem;
+  margin: 1rem 0;
   color: #333;
   text-align: left;
 }
-.insight ul { list-style: none; padding: 0; }
-.insight li {
-  margin: 1.125rem 0; /* 18px */
-  position: relative;
-  padding-left: 2rem; /* 32px */
+
+.insight ul {
+  list-style: none;
+  padding: 0;
 }
+
+.insight li {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 0.75rem; /* 12px */
-  font-size: 1.5rem; /* 24px */
+  left: 0;
+  font-size: 1rem;
 }
 
 .message {
-  margin-top: 1.875rem; /* 30px */
+  margin-top: 1rem;
   font-weight: 600;
   display: none;
 }
+
 .message.error { color: #e74c3c; }
 .message.success { color: #28a745; }
 
 .cases {
   list-style: none;
   padding: 0;
-  margin: 1.5625rem 0 2.1875rem; /* 25px 35px */
+  margin: 0.75rem 0;
 }
+
 .cases li {
-  margin: 1.125rem 0; /* 18px */
-  font-size: 1.5rem; /* 24px */
+  margin: 0.5rem 0;
+  font-size: 1rem;
   color: #333;
 }
 
 .primary-link {
-  display: inline-block;
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 1.375rem 2.375rem; /* 22px 38px */
-  border-radius: 18px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
   font-weight: 600;
-  font-size: 1.5rem; /* 24px */
-  transition: background 0.25s;
+  font-size: 1rem;
+  transition: background 0.2s;
 }
-.primary-link:hover { background: #3651d6; }
 
-/* Теперь задаём стили специально для мобильных устройств */
+.primary-link:hover {
+  background: #3651d6;
+}
+
 @media (max-width: 768px) {
-  html {
-    font-size: 32px; /* Новый базовый размер шрифта для телефонов */
+  html { font-size: clamp(24px, 5vw, 28px); }
+  .container { padding: 3rem; }
+  button {
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+    font-size: 2rem;
   }
-
-  body {
-    font-size: 1.5rem; /* Шрифты станут крупнее пропорционально новому базовому размеру */
+  input {
+    padding: 1.5rem;
+    border-radius: 1rem;
+    font-size: 2rem;
+    margin: 1.5rem 0;
   }
-
-  h1 {
-    font-size: 2.375rem; /* Пропорционально увеличится относительно нового базового размера */
-  }
-
-  h2 {
-    font-size: 2.125rem; /* То же самое */
-  }
-
-  .subtitle,
-  .insight,
-  .cases li {
-    font-size: 1.5rem; /* Остальные блоки тоже будут масштабироваться пропорционально */
-  }
-
-  button,
-  input,
   .primary-link {
-    font-size: 1.5rem; /* Кнопки и поля становятся заметно крупнее */
-    padding: 1.75rem 2.5rem; /* Пространство вокруг увеличенных элементов */
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+    font-size: 2rem;
   }
-
-  .container {
-    padding: 3.5rem; /* Контейнер получил больше внутреннего пространства */
-  }
-
-  .message {
-    font-size: 1.5rem; /* Сообщения теперь видны лучше */
-  }
+  h1 { font-size: 3.5rem; margin-bottom: 2rem; }
+  h2 { font-size: 3rem; margin-bottom: 1.5rem; }
+  .subtitle { font-size: 2rem; margin-bottom: 2rem; }
+  .insight { font-size: 2rem; margin: 2rem 0; }
+  .insight li { margin: 1rem 0; padding-left: 2rem; }
+  .insight li::before { font-size: 2rem; }
+  .cases { margin: 1.5rem 0; }
+  .cases li { font-size: 2rem; margin: 1rem 0; }
+  .message { font-size: 2rem; margin-top: 2rem; }
 }
