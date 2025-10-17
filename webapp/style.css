@@ -1,5 +1,5 @@
 html {
-  font-size: clamp(14px, 2.5vw, 16px);
+  font-size: 16px;
 }
 
 body {
@@ -164,31 +164,36 @@ input.error {
 }
 
 @media (max-width: 768px) {
-  html { font-size: clamp(24px, 5vw, 28px); }
-  .container { padding: 3rem; }
-  button {
-    padding: 1.5rem 2rem;
-    border-radius: 1.5rem;
-    font-size: 2rem;
-  }
-  input {
-    padding: 1.5rem;
-    border-radius: 1rem;
-    font-size: 2rem;
-    margin: 1.5rem 0;
-  }
-  .primary-link {
-    padding: 1.5rem 2rem;
-    border-radius: 1.5rem;
-    font-size: 2rem;
-  }
+  html { font-size: 32px; }
+  body { font-size: 2.5rem; }
+  .container { padding: 4rem; }
   h1 { font-size: 3.5rem; margin-bottom: 2rem; }
   h2 { font-size: 3rem; margin-bottom: 1.5rem; }
   .subtitle { font-size: 2rem; margin-bottom: 2rem; }
+  button {
+    font-size: 2rem;
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+  }
+  input {
+    font-size: 2rem;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    margin: 1.5rem 0;
+  }
   .insight { font-size: 2rem; margin: 2rem 0; }
-  .insight li { margin: 1rem 0; padding-left: 2rem; }
+  .insight li {
+    font-size: 2rem;
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
   .insight li::before { font-size: 2rem; }
+  .message { font-size: 2rem; margin-top: 2rem; }
   .cases { margin: 1.5rem 0; }
   .cases li { font-size: 2rem; margin: 1rem 0; }
-  .message { font-size: 2rem; margin-top: 2rem; }
+  .primary-link {
+    font-size: 2rem;
+    padding: 1.5rem 2rem;
+    border-radius: 1.5rem;
+  }
 }
