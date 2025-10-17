@@ -1,5 +1,6 @@
 html {
   font-size: 16px; /* Базовый размер для десктопа */
+  line-height: 1.5;
 }
 
 body {
@@ -9,8 +10,8 @@ body {
   text-align: center;
   padding: 0;
   margin: 0;
-  font-size: 24px;
-  height: 100vh;
+  font-size: 1.5rem; /* 24px */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -19,9 +20,9 @@ body {
 
 .container {
   background: #fff;
-  padding: 50px 40px;
-  border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  padding: 3.125rem 2.5rem; /* 50px 40px */
+  border-radius: 1.25rem; /* 20px */
+  box-shadow: 0 0.5rem 1.5625rem rgba(0, 0, 0, 0.1); /* 8px 25px */
   width: 100%;
   max-width: none;
   min-height: 90vh;
@@ -33,44 +34,50 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 38px;
-  margin-bottom: 30px;
+  font-size: 2.375rem; /* 38px */
+  margin-bottom: 1.875rem; /* 30px */
   color: #2d3e50;
   line-height: 1.4;
 }
+
 h2 {
-  font-size: 34px;
-  margin-bottom: 25px;
+  font-size: 2.125rem; /* 34px */
+  margin-bottom: 1.5625rem; /* 25px */
   color: #2d3e50;
 }
+
 .subtitle {
   color: #555;
-  font-size: 24px;
-  margin-bottom: 40px;
+  font-size: 1.5rem; /* 24px */
+  margin-bottom: 2.5rem; /* 40px */
   line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 1.5625rem; /* 25px */
 }
 
 button {
   border: none;
-  border-radius: 18px;
-  padding: 24px 36px;
-  font-size: 24px;
+  border-radius: 1.125rem; /* 18px */
+  padding: 1.5rem 2.25rem; /* 24px 36px */
+  font-size: 1.5rem; /* 24px */
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600;
 }
-button:hover { transform: translateY(-4px); }
+
+button:hover {
+  transform: translateY(-0.25rem); /* -4px */
+}
 
 button.primary {
   background: #4361ee;
   color: white;
 }
+
 button.primary:hover {
   background: #3651d6;
 }
@@ -79,68 +86,83 @@ button.primary:hover {
   background: #f2f4f8;
   color: #222;
 }
+
 #scenario-buttons button:hover {
   background: #e2e6ee;
 }
 
 input {
   width: 100%;
-  margin: 18px 0;
-  padding: 22px 24px;
-  border-radius: 15px;
+  margin: 1.125rem 0; /* 18px */
+  padding: 1.375rem 1.5rem; /* 22px 24px */
+  border-radius: 0.9375rem; /* 15px */
   border: 2px solid #d0d4dc;
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
+
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
+  box-shadow: 0 0 0.625rem rgba(67, 97, 238, 0.6); /* 10px */
 }
 
 input.error {
-  border-color: #e74c3c !important;
-  box-shadow: 0 0 10px rgba(231, 76, 60, 0.6) !important;
+  border-color: #e74c3c;
+  box-shadow: 0 0 0.625rem rgba(231, 76, 60, 0.6);
 }
 
 .insight {
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   line-height: 1.6;
-  margin: 35px 0 45px;
+  margin: 2.1875rem 0 2.8125rem; /* 35px 45px */
   color: #333;
   text-align: left;
 }
-.insight ul { list-style: none; padding: 0; }
-.insight li {
-  margin: 18px 0;
-  position: relative;
-  padding-left: 32px;
+
+.insight ul {
+  list-style: none;
+  padding: 0;
 }
+
+.insight li {
+  margin: 1.125rem 0; /* 18px */
+  position: relative;
+  padding-left: 2rem; /* 32px */
+}
+
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 12px;
-  font-size: 24px;
+  left: 0.75rem; /* 12px */
+  font-size: 1.5rem; /* 24px */
 }
 
 .message {
-  margin-top: 30px;
+  margin-top: 1.875rem; /* 30px */
   font-weight: 600;
   display: none;
 }
-.message.error { color: #e74c3c; }
-.message.success { color: #28a745; }
+
+.message.error {
+  color: #e74c3c;
+}
+
+.message.success {
+  color: #28a745;
+}
 
 .cases {
   list-style: none;
   padding: 0;
-  margin: 25px 0 35px;
+  margin: 1.5625rem 0 2.1875rem; /* 25px 35px */
 }
+
 .cases li {
-  margin: 18px 0;
-  font-size: 24px;
+  margin: 1.125rem 0; /* 18px */
+  font-size: 1.5rem; /* 24px */
   color: #333;
 }
 
@@ -149,61 +171,89 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 22px 38px;
-  border-radius: 18px;
+  padding: 1.375rem 2.375rem; /* 22px 38px */
+  border-radius: 1.125rem; /* 18px */
   font-weight: 600;
-  font-size: 24px;
+  font-size: 1.5rem; /* 24px */
   transition: background 0.25s;
 }
-.primary-link:hover { background: #3651d6; }
+
+.primary-link:hover {
+  background: #3651d6;
+}
 
 @media (max-width: 768px) {
   html {
-    font-size: 20px !important; /* Увеличиваем базовый размер для мобильных */
+    font-size: 22px; /* Увеличиваем базовый размер для мобильных */
   }
-  body {
-    font-size: 1.6rem !important; /* ~32px */
-  }
-  h1 {
-    font-size: 2.4rem !important; /* ~48px */
-  }
-  h2 {
-    font-size: 2.1rem !important; /* ~42px */
-  }
-  .subtitle {
-    font-size: 1.5rem !important; /* ~30px */
-  }
+
   .container {
-    padding: 3rem !important; /* ~60px */
+    transform: scale(1.2); /* Визуальный зум на 20% */
+    transform-origin: top center;
+    padding: 3.5rem 3rem; /* ~77px 66px */
     min-height: 95vh;
+    width: 90%;
+    margin: 0 auto;
   }
+
+  body {
+    font-size: 1.6rem; /* ~35px */
+  }
+
+  h1 {
+    font-size: 2.5rem; /* ~55px */
+    margin-bottom: 2rem; /* ~44px */
+  }
+
+  h2 {
+    font-size: 2.2rem; /* ~48px */
+    margin-bottom: 1.8rem; /* ~40px */
+  }
+
+  .subtitle {
+    font-size: 1.6rem; /* ~35px */
+    margin-bottom: 2.8rem; /* ~62px */
+  }
+
+  #scenario-buttons {
+    gap: 1.8rem; /* ~40px */
+  }
+
   button {
-    padding: 1.6rem 2.4rem !important; /* ~32px 48px */
-    font-size: 1.5rem !important; /* ~30px */
-    border-radius: 22px !important;
+    padding: 1.8rem 2.5rem; /* ~40px 55px */
+    font-size: 1.6rem; /* ~35px */
+    border-radius: 1.4rem; /* ~31px */
   }
+
   input {
-    padding: 1.5rem 1.6rem !important; /* ~30px 32px */
-    font-size: 1.5rem !important; /* ~30px */
-    border-radius: 18px !important;
+    padding: 1.6rem 1.8rem; /* ~35px 40px */
+    font-size: 1.6rem; /* ~35px */
+    border-radius: 1.2rem; /* ~26px */
+    margin: 1.4rem 0; /* ~31px */
   }
+
   .insight {
-    font-size: 1.5rem !important; /* ~30px */
-    margin: 2.5rem 0 3.2rem !important; /* ~50px 64px */
+    font-size: 1.6rem; /* ~35px */
+    margin: 2.5rem 0 3.5rem; /* ~55px 77px */
   }
+
   .insight li {
-    padding-left: 2.2rem !important; /* ~44px */
+    padding-left: 2.5rem; /* ~55px */
   }
+
   .insight li::before {
-    left: 0.8rem !important; /* ~16px */
-    font-size: 1.5rem !important; /* ~30px */
+    left: 1rem; /* ~22px */
+    font-size: 1.6rem; /* ~35px */
   }
+
   .cases li {
-    font-size: 1.5rem !important; /* ~30px */
+    font-size: 1.6rem; /* ~35px */
+    margin: 1.4rem 0; /* ~31px */
   }
+
   .primary-link {
-    padding: 1.5rem 2.4rem !important; /* ~30px 48px */
-    font-size: 1.5rem !important; /* ~30px */
-    border-radius: 22px !important;
+    padding: 1.6rem 2.5rem; /* ~35px 55px */
+    font-size: 1.6rem; /* ~35px */
+    border-radius: 1.4rem; /* ~31px */
   }
 }
