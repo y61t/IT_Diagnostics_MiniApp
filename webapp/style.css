@@ -24,13 +24,20 @@ body {
 /* === Контейнер === */
 .container {
   background: #fff;
-  padding: 2rem;
   border-radius: 1rem;
-  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
-  width: min(90%, 40rem);
+  width: min(95%, 40rem);
   max-width: 600px;
-  max-height: 95vh;
-  overflow-y: auto;
+  max-height: 95vh;          /* контейнер не выше экрана */
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem;
+  box-shadow: 0 0.25rem 1rem rgba(0,0,0,0.1);
+  overflow-y: auto;          /* скролл для содержимого */
+}
+
+/* Чтобы контент не сжимался */
+.container > * {
+  flex-shrink: 0;
 }
 
 /* === Скрытые элементы === */
@@ -57,25 +64,34 @@ h2 {
   margin-bottom: 1rem;
 }
 
-/* === Кнопки === */
-#scenario-buttons {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-button {
-  border: none;
+/* === Кнопки (на всю ширину) === */
+#scenario-buttons button,
+button.primary,
+.primary-link {
+  width: 100%;                /* на всю ширину контейнера */
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
   border-radius: 0.75rem;
-  padding: 0.6rem 1rem;
   font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.2s;
   font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
 }
 
-button:hover {
+#scenario-buttons button:hover,
+button.primary:hover,
+.primary-link:hover {
   transform: translateY(-0.125rem);
+}
+
+#scenario-buttons button {
+  background: #f2f4f8;
+  color: #222;
+}
+
+#scenario-buttons button:hover {
+  background: #e2e6ee;
 }
 
 button.primary {
@@ -87,13 +103,22 @@ button.primary:hover {
   background: #3651d6;
 }
 
-#scenario-buttons button {
-  background: #f2f4f8;
-  color: #222;
+.primary-link {
+  background: #4361ee;
+  color: #fff;
+  text-decoration: none;
 }
 
-#scenario-buttons button:hover {
-  background: #e2e6ee;
+.primary-link:hover {
+  background: #3651d6;
+}
+
+/* Кнопки внизу всегда видны */
+#scenario-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: auto; /* нижние кнопки остаются внизу контейнера */
 }
 
 /* === Поля ввода === */
@@ -168,59 +193,24 @@ input.error {
   color: #333;
 }
 
-/* === Ссылки === */
-.primary-link {
-  background: #4361ee;
-  color: #fff;
-  text-decoration: none;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
-  font-weight: 600;
-  font-size: 1rem;
-  transition: background 0.2s;
-}
-
-.primary-link:hover {
-  background: #3651d6;
-}
-
 /* === Мобильная адаптация === */
 @media (pointer: coarse), (max-width: 900px) {
-  html {
-    font-size: 20px;
-  }
+  html { font-size: 20px; }
 
-  body {
-    font-size: 1.25rem;
-  }
+  body { font-size: 1.25rem; }
 
   .container {
-    padding: 2rem;
-    border-radius: 1rem;
+    padding: 1.5rem;
     width: 95%;
-    max-width: none;
     max-height: 95vh;
     overflow-y: auto;
   }
 
-  h1 {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-  }
+  h1 { font-size: 2rem; margin-bottom: 1rem; }
+  h2 { font-size: 1.5rem; margin-bottom: 0.75rem; }
+  .subtitle { font-size: 1.25rem; margin-bottom: 1rem; }
 
-  h2 {
-    font-size: 1.5rem;
-    margin-bottom: 0.75rem;
-  }
-
-  .subtitle {
-    font-size: 1.25rem;
-    margin-bottom: 1rem;
-  }
-
-  button,
-  input,
-  .primary-link {
+  button, input, .primary-link {
     font-size: 1.25rem;
     padding: 1rem 1.5rem;
     border-radius: 1rem;
@@ -237,17 +227,8 @@ input.error {
     padding-left: 1.5rem;
   }
 
-  .insight li::before {
-    font-size: 1.25rem;
-  }
+  .insight li::before { font-size: 1.25rem; }
 
-  .message {
-    font-size: 1.25rem;
-    margin-top: 1rem;
-  }
-
-  .cases li {
-    font-size: 1.25rem;
-    margin: 0.75rem 0;
-  }
+  .message { font-size: 1.25rem; margin-top: 1rem; }
+  .cases li { font-size: 1.25rem; margin: 0.75rem 0; }
 }
