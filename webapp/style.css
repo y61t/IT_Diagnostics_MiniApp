@@ -1,6 +1,5 @@
-/* 🔧 Базовая адаптация под все экраны */
 html {
-  font-size: clamp(18px, 2.3vw, 24px);
+  font-size: 16px; /* Базовый размер шрифта для rem */
 }
 
 body {
@@ -10,7 +9,7 @@ body {
   text-align: center;
   padding: 0;
   margin: 0;
-  font-size: 1rem; /* теперь гибкий размер */
+  font-size: 1.5rem; /* 24px при базовом 16px */
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -20,9 +19,9 @@ body {
 
 .container {
   background: #fff;
-  padding: 50px 40px;
+  padding: 3.125rem 2.5rem; /* 50px 40px */
   border-radius: 20px;
-  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
   width: 100%;
   max-width: none;
   min-height: 90vh;
@@ -34,34 +33,34 @@ body {
 .hidden { display: none; }
 
 h1 {
-  font-size: 2.4rem;
-  margin-bottom: 30px;
+  font-size: 2.375rem; /* 38px */
+  margin-bottom: 1.875rem; /* 30px */
   color: #2d3e50;
   line-height: 1.4;
 }
 h2 {
-  font-size: 2.1rem;
-  margin-bottom: 25px;
+  font-size: 2.125rem; /* 34px */
+  margin-bottom: 1.5625rem; /* 25px */
   color: #2d3e50;
 }
 .subtitle {
   color: #555;
-  font-size: 1rem;
-  margin-bottom: 40px;
+  font-size: 1.5rem; /* 24px */
+  margin-bottom: 2.5rem; /* 40px */
   line-height: 1.6;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 25px;
+  gap: 1.5625rem; /* 25px */
 }
 
 button {
   border: none;
   border-radius: 18px;
-  padding: 24px 36px;
-  font-size: 1rem;
+  padding: 1.5rem 2.25rem; /* 24px 36px */
+  font-size: 1.5rem; /* 24px */
   cursor: pointer;
   transition: all 0.25s ease;
   font-weight: 600;
@@ -86,48 +85,48 @@ button.primary:hover {
 
 input {
   width: 100%;
-  margin: 18px 0;
-  padding: 22px 24px;
+  margin: 1.125rem 0; /* 18px */
+  padding: 1.375rem 1.5rem; /* 22px 24px */
   border-radius: 15px;
   border: 2px solid #d0d4dc;
-  font-size: 1rem;
+  font-size: 1.5rem; /* 24px */
   transition: all 0.2s ease;
   box-sizing: border-box;
 }
 input:focus {
   border-color: #4361ee;
   outline: none;
-  box-shadow: 0 0 10px rgba(67,97,238,0.6);
+  box-shadow: 0 0 10px rgba(67, 97, 238, 0.6);
 }
 
 input.error {
   border-color: #e74c3c !important;
-  box-shadow: 0 0 10px rgba(231,76,60,0.6) !important;
+  box-shadow: 0 0 10px rgba(231, 76, 60, 0.6) !important;
 }
 
 .insight {
-  font-size: 1rem;
+  font-size: 1.5rem; /* 24px */
   line-height: 1.6;
-  margin: 35px 0 45px;
+  margin: 2.1875rem 0 2.8125rem; /* 35px 45px */
   color: #333;
   text-align: left;
 }
 .insight ul { list-style: none; padding: 0; }
 .insight li {
-  margin: 18px 0;
+  margin: 1.125rem 0; /* 18px */
   position: relative;
-  padding-left: 32px;
+  padding-left: 2rem; /* 32px */
 }
 .insight li::before {
   content: "•";
   color: #4361ee;
   position: absolute;
-  left: 12px;
-  font-size: 1rem;
+  left: 0.75rem; /* 12px */
+  font-size: 1.5rem; /* 24px */
 }
 
 .message {
-  margin-top: 30px;
+  margin-top: 1.875rem; /* 30px */
   font-weight: 600;
   display: none;
 }
@@ -137,11 +136,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 25px 0 35px;
+  margin: 1.5625rem 0 2.1875rem; /* 25px 35px */
 }
 .cases li {
-  margin: 18px 0;
-  font-size: 1rem;
+  margin: 1.125rem 0; /* 18px */
+  font-size: 1.5rem; /* 24px */
   color: #333;
 }
 
@@ -150,41 +149,36 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 22px 38px;
+  padding: 1.375rem 2.375rem; /* 22px 38px */
   border-radius: 18px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 1.5rem; /* 24px */
   transition: background 0.25s;
 }
 .primary-link:hover { background: #3651d6; }
 
-/* 📱 Мобильная адаптация под Telegram WebApp */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
   html {
-    font-size: 22px; /* немного увеличим масштаб текста */
+    font-size: 18px; /* Увеличиваем базовый размер для мобильных */
   }
-  h1 { font-size: 2.6rem; }
-  h2 { font-size: 2.2rem; }
+  h1 { font-size: 2rem; /* ~36px при 18px базовом */ }
+  h2 { font-size: 1.777rem; /* ~32px */ }
   .container {
-    padding: 36px 28px;
+    padding: 2.5rem; /* 40px */
     min-height: 95vh;
   }
-  button, input, .primary-link {
-    font-size: 1.1rem;
-    padding: 20px 30px;
+  button {
+    padding: 1.25rem 2rem; /* 22.5px 36px */
+    font-size: 1.333rem; /* ~24px */
   }
-  .insight, .cases li {
-    font-size: 1.1rem;
+  input {
+    padding: 1.111rem 1.333rem; /* ~20px 24px */
+    font-size: 1.333rem; /* ~24px */
   }
-}
-/* 🔧 Принудительное увеличение масштаба внутри Telegram WebApp */
-@media (max-width: 768px) {
-  body {
-    zoom: 1.25;              /* Увеличиваем весь контент на 25% */
-    transform-origin: top center;
-  }
-
-  html {
-    font-size: 110%;         /* Дополнительно увеличим базовый шрифт */
+  .insight { font-size: 1.333rem; /* ~24px */ }
+  .cases li { font-size: 1.333rem; /* ~24px */ }
+  .primary-link {
+    padding: 1.111rem 2rem; /* ~20px 36px */
+    font-size: 1.333rem; /* ~24px */
   }
 }
