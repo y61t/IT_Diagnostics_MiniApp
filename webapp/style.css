@@ -5,7 +5,7 @@ body {
   text-align: center;
   padding: 40px 20px;
   margin: 0;
-  font-size: 555% !important; /* Базовое увеличение в 2 раза для наследуемых элементов */
+  font-size: 600% !important; /* Увеличиваем базовый шрифт в 2 раза от предыдущего (было 300%, теперь 600%) */
 }
 
 .container {
@@ -13,22 +13,23 @@ body {
   padding: 40px 30px;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  max-width: 520px;
+  max-width: 100%; /* Делаем контейнер на всю ширину экрана */
+  width: 100%; /* Полная ширина */
   margin: 0 auto 30px auto;
   transition: opacity 0.4s ease;
 }
 
 .hidden { display: none; }
 
-h1 { font-size: 48px; margin-bottom: 16px; color: #2d3e50; line-height: 1.4; }
-h2 { font-size: 44px; margin-bottom: 12px; color: #2d3e50; }
-.subtitle { color: #555; font-size: 30px; margin-bottom: 25px; line-height: 1.5; }
+h1 { font-size: 144px; margin-bottom: 16px; color: #2d3e50; line-height: 1.4; }
+h2 { font-size: 132px; margin-bottom: 12px; color: #2d3e50; }
+.subtitle { color: #555; font-size: 90px; margin-bottom: 25px; line-height: 1.5; }
 
 #scenario-buttons { display: flex; flex-direction: column; gap: 12px; }
 
 button {
   border: none; border-radius: 10px; padding: 14px 18px;
-  font-size: 30px; cursor: pointer; transition: all 0.25s ease; font-weight: 500;
+  font-size: 90px; cursor: pointer; transition: all 0.25s ease; font-weight: 500;
 }
 button:hover { transform: translateY(-1px); }
 
@@ -39,14 +40,15 @@ button.primary:hover { background: #3651d6; }
 #scenario-buttons button:hover { background: #e2e6ee; }
 
 input {
-  width: 90%; max-width: 360px; margin: 8px 0; padding: 12px 14px;
-  border-radius: 8px; border: 1px solid #d0d4dc; font-size: 30px; transition: all 0.2s ease;
+  width: 90%; max-width: none; /* Убираем ограничение ширины для инпута, чтобы он растягивался */
+  margin: 8px 0; padding: 12px 14px;
+  border-radius: 8px; border: 1px solid #d0d4dc; font-size: 90px; transition: all 0.2s ease;
 }
 input:focus { border-color: #4361ee; outline: none; box-shadow: 0 0 4px rgba(67,97,238,0.3); }
 
 input.error { border-color: #e74c3c !important; box-shadow: 0 0 4px rgba(231,76,60,0.3) !important; }
 
-.insight { font-size: 30px; line-height: 1.5; margin: 20px 0 30px; color: #333; text-align: left; }
+.insight { font-size: 90px; line-height: 1.5; margin: 20px 0 30px; color: #333; text-align: left; }
 .insight ul { list-style: none; padding: 0; }
 .insight li { margin: 8px 0; position: relative; padding-left: 20px; }
 .insight li::before { content: "•"; color: #4361ee; position: absolute; left: 6px; }
@@ -56,7 +58,7 @@ input.error { border-color: #e74c3c !important; box-shadow: 0 0 4px rgba(231,76,
 .message.success { color: #28a745; }
 
 .cases { list-style: none; padding: 0; margin: 10px 0 20px; }
-.cases li { margin: 8px 0; font-size: 30px; color: #333; }
+.cases li { margin: 8px 0; font-size: 90px; color: #333; }
 
 .primary-link {
   display: inline-block; background: #4361ee; color: #fff; text-decoration: none;
@@ -65,7 +67,7 @@ input.error { border-color: #e74c3c !important; box-shadow: 0 0 4px rgba(231,76,
 .primary-link:hover { background: #3651d6; }
 
 @media (max-width: 480px) {
-  h1 { font-size: 40px; }
-  h2 { font-size: 36px; }
+  h1 { font-size: 120px; }
+  h2 { font-size: 108px; }
   .container { padding: 25px; }
 }
