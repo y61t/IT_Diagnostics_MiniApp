@@ -16,43 +16,44 @@ body {
 
 .container {
   background: #fff;
-  padding: 2rem;
-  border-radius: 1rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
   box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
   width: min(90%, 40rem);
   box-sizing: border-box;
+  overflow: auto;
 }
 
 .hidden { display: none; }
 
 h1 {
   font-size: 1.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   color: #2d3e50;
 }
 
 h2 {
   font-size: 1.5rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   color: #2d3e50;
 }
 
 .subtitle {
   color: #555;
   font-size: 1rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 #scenario-buttons {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.5rem;
 }
 
 button {
   border: none;
-  border-radius: 0.75rem;
-  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -83,12 +84,11 @@ button.primary:hover {
 
 input {
   width: 100%;
-  margin: 0.75rem 0;
-  padding: 0.75rem;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
   border-radius: 0.5rem;
   border: 2px solid #d0d4dc;
   font-size: 1rem;
-  transition: all 0.2s;
   box-sizing: border-box;
 }
 
@@ -103,7 +103,7 @@ input.error {
 
 .insight {
   font-size: 1rem;
-  margin: 1rem 0;
+  margin: 0.5rem 0;
   color: #333;
   text-align: left;
 }
@@ -114,7 +114,7 @@ input.error {
 }
 
 .insight li {
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
   padding-left: 1rem;
   position: relative;
 }
@@ -128,7 +128,7 @@ input.error {
 }
 
 .message {
-  margin-top: 1rem;
+  margin-top: 0.5rem;
   font-weight: 600;
   display: none;
 }
@@ -139,11 +139,11 @@ input.error {
 .cases {
   list-style: none;
   padding: 0;
-  margin: 0.75rem 0;
+  margin: 0.5rem 0;
 }
 
 .cases li {
-  margin: 0.5rem 0;
+  margin: 0.25rem 0;
   font-size: 1rem;
   color: #333;
 }
@@ -152,11 +152,12 @@ input.error {
   background: #4361ee;
   color: #fff;
   text-decoration: none;
-  padding: 0.75rem 1rem;
-  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
   font-weight: 600;
   font-size: 1rem;
   transition: background 0.2s;
+  display: inline-block;
 }
 
 .primary-link:hover {
@@ -164,36 +165,40 @@ input.error {
 }
 
 @media (max-width: 768px) {
-  html { font-size: 25vw; }
-  body { font-size: 5rem; }
-  .container { padding: 8rem; }
-  h1 { font-size: 7rem; margin-bottom: 4rem; }
-  h2 { font-size: 6rem; margin-bottom: 3rem; }
-  .subtitle { font-size: 4rem; margin-bottom: 4rem; }
+  html { font-size: 50vw !important; }
+  body { font-size: 10rem !important; line-height: 1.2; }
+  .container {
+    padding: 1rem !important;
+    width: 100% !important;
+    overflow: auto !important;
+  }
+  h1 { font-size: 14rem !important; margin-bottom: 0.5rem !important; }
+  h2 { font-size: 12rem !important; margin-bottom: 0.5rem !important; }
+  .subtitle { font-size: 8rem !important; margin-bottom: 0.5rem !important; }
   button {
-    font-size: 4rem;
-    padding: 3rem 4rem;
-    border-radius: 3rem;
+    font-size: 8rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 1rem !important;
   }
   input {
-    font-size: 4rem;
-    padding: 3rem;
-    border-radius: 2rem;
-    margin: 3rem 0;
+    font-size: 8rem !important;
+    padding: 0.5rem !important;
+    border-radius: 1rem !important;
+    margin: 0.5rem 0 !important;
   }
-  .insight { font-size: 4rem; margin: 4rem 0; }
+  .insight { font-size: 8rem !important; margin: 0.5rem 0 !important; }
   .insight li {
-    font-size: 4rem;
-    margin: 2rem 0;
-    padding-left: 4rem;
+    font-size: 8rem !important;
+    margin: 0.25rem 0 !important;
+    padding-left: 2rem !important;
   }
-  .insight li::before { font-size: 4rem; }
-  .message { font-size: 4rem; margin-top: 4rem; }
-  .cases { margin: 3rem 0; }
-  .cases li { font-size: 4rem; margin: 2rem 0; }
+  .insight li::before { font-size: 8rem !important; }
+  .message { font-size: 8rem !important; margin-top: 0.5rem !important; }
+  .cases { margin: 0.5rem 0 !important; }
+  .cases li { font-size: 8rem !important; margin: 0.25rem 0 !important; }
   .primary-link {
-    font-size: 4rem;
-    padding: 3rem 4rem;
-    border-radius: 3rem;
+    font-size: 8rem !important;
+    padding: 0.5rem 1rem !important;
+    border-radius: 1rem !important;
   }
 }
