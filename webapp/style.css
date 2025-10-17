@@ -1,73 +1,187 @@
-body {
-  font-family: "Inter", Arial, sans-serif;
-  background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
-  color: #1e1e2d;
-  text-align: center;
-  padding: 40px 20px;
-  margin: 0;
-  font-size: 600% !important; /* Увеличиваем базовый шрифт в 2 раза от предыдущего (было 300%, теперь 600%) */
-}
+html {
+     font-size: 16px;
+   }
 
-.container {
-  background: #fff;
-  padding: 40px 30px;
-  border-radius: 16px;
-  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
-  max-width: 100%; /* Делаем контейнер на всю ширину экрана */
-  width: 100%; /* Полная ширина */
-  margin: 0 auto 30px auto;
-  transition: opacity 0.4s ease;
-}
+   body {
+     font-family: "Inter", Arial, sans-serif;
+     background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
+     color: #1e1e2d;
+     margin: 0;
+     font-size: 1.25rem;
+     min-height: 100vh;
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     line-height: 1.2;
+   }
 
-.hidden { display: none; }
+   .container {
+     background: #fff;
+     padding: 0.5rem;
+     border-radius: 0.5rem;
+     box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+     width: 100%;
+     box-sizing: border-box;
+     overflow: auto !important;
+   }
 
-h1 { font-size: 144px; margin-bottom: 16px; color: #2d3e50; line-height: 1.4; }
-h2 { font-size: 132px; margin-bottom: 12px; color: #2d3e50; }
-.subtitle { color: #555; font-size: 90px; margin-bottom: 25px; line-height: 1.5; }
+   .hidden { display: none; }
 
-#scenario-buttons { display: flex; flex-direction: column; gap: 12px; }
+   h1 {
+     font-size: 1.75rem;
+     margin-bottom: 0.5rem;
+     color: #2d3e50;
+   }
 
-button {
-  border: none; border-radius: 10px; padding: 14px 18px;
-  font-size: 90px; cursor: pointer; transition: all 0.25s ease; font-weight: 500;
-}
-button:hover { transform: translateY(-1px); }
+   h2 {
+     font-size: 1.5rem;
+     margin-bottom: 0.5rem;
+     color: #2d3e50;
+   }
 
-button.primary { background: #4361ee; color: white; }
-button.primary:hover { background: #3651d6; }
+   .subtitle {
+     color: #555;
+     font-size: 1rem;
+     margin-bottom: 0.5rem;
+   }
 
-#scenario-buttons button { background: #f2f4f8; color: #222; }
-#scenario-buttons button:hover { background: #e2e6ee; }
+   #scenario-buttons {
+     display: flex;
+     flex-direction: column;
+     gap: 0.5rem;
+   }
 
-input {
-  width: 90%; max-width: none; /* Убираем ограничение ширины для инпута, чтобы он растягивался */
-  margin: 8px 0; padding: 12px 14px;
-  border-radius: 8px; border: 1px solid #d0d4dc; font-size: 90px; transition: all 0.2s ease;
-}
-input:focus { border-color: #4361ee; outline: none; box-shadow: 0 0 4px rgba(67,97,238,0.3); }
+   button {
+     border: none;
+     border-radius: 0.5rem;
+     padding: 0.5rem 1rem;
+     font-size: 1rem;
+     cursor: pointer;
+     font-weight: 600;
+   }
 
-input.error { border-color: #e74c3c !important; box-shadow: 0 0 4px rgba(231,76,60,0.3) !important; }
+   button.primary {
+     background: #4361ee;
+     color: #fff;
+   }
 
-.insight { font-size: 90px; line-height: 1.5; margin: 20px 0 30px; color: #333; text-align: left; }
-.insight ul { list-style: none; padding: 0; }
-.insight li { margin: 8px 0; position: relative; padding-left: 20px; }
-.insight li::before { content: "•"; color: #4361ee; position: absolute; left: 6px; }
+   #scenario-buttons button {
+     background: #f2f4f8;
+     color: #222;
+   }
 
-.message { margin-top: 15px; font-weight: 600; display: none; }
-.message.error { color: #e74c3c; }
-.message.success { color: #28a745; }
+   input {
+     width: 100%;
+     margin: 0.5rem 0;
+     padding: 0.5rem;
+     border-radius: 0.5rem;
+     border: 2px solid #d0d4dc;
+     font-size: 1rem;
+     box-sizing: border-box;
+   }
 
-.cases { list-style: none; padding: 0; margin: 10px 0 20px; }
-.cases li { margin: 8px 0; font-size: 90px; color: #333; }
+   input:focus {
+     border-color: #4361ee;
+     outline: none;
+   }
 
-.primary-link {
-  display: inline-block; background: #4361ee; color: #fff; text-decoration: none;
-  padding: 12px 24px; border-radius: 10px; font-weight: 500; transition: background 0.25s;
-}
-.primary-link:hover { background: #3651d6; }
+   input.error {
+     border-color: #e74c3c;
+   }
 
-@media (max-width: 480px) {
-  h1 { font-size: 120px; }
-  h2 { font-size: 108px; }
-  .container { padding: 25px; }
-}
+   .insight {
+     font-size: 1rem;
+     margin: 0.5rem 0;
+     color: #333;
+     text-align: left;
+   }
+
+   .insight ul {
+     list-style: none;
+     padding: 0;
+   }
+
+   .insight li {
+     margin: 0.25rem 0;
+     padding-left: 1rem;
+     position: relative;
+   }
+
+   .insight li::before {
+     content: "•";
+     color: #4361ee;
+     position: absolute;
+     left: 0;
+     font-size: 1rem;
+   }
+
+   .message {
+     margin-top: 0.5rem;
+     font-weight: 600;
+     display: none;
+   }
+
+   .message.error { color: #e74c3c; }
+   .message.success { color: #28a745; }
+
+   .cases {
+     list-style: none;
+     padding: 0;
+     margin: 0.5rem 0;
+   }
+
+   .cases li {
+     margin: 0.25rem 0;
+     font-size: 1rem;
+     color: #333;
+   }
+
+   .primary-link {
+     background: #4361ee;
+     color: #fff;
+     text-decoration: none;
+     padding: 0.5rem 1rem;
+     border-radius: 0.5rem;
+     font-weight: 600;
+     font-size: 1rem;
+     display: inline-block;
+   }
+
+   @media (max-width: 768px) {
+     html { font-size: 200px !important; } /* Базовый огромный размер, одна буква ~200px+ */
+     body { font-size: 1rem !important; line-height: 1 !important; } /* Текст доминирует */
+     .container {
+       padding: 0.1rem !important; /* Минимальные отступы */
+       width: 100% !important;
+       overflow: auto !important;
+     }
+     h1 { font-size: 2rem !important; margin-bottom: 0.1rem !important; } /* ~400px */
+     h2 { font-size: 1.5rem !important; margin-bottom: 0.1rem !important; } /* ~300px */
+     .subtitle { font-size: 1rem !important; margin-bottom: 0.1rem !important; } /* ~200px */
+     button {
+       font-size: 1rem !important;
+       padding: 0.1rem 0.2rem !important;
+       border-radius: 0.2rem !important;
+     }
+     input {
+       font-size: 1rem !important;
+       padding: 0.1rem !important;
+       border-radius: 0.2rem !important;
+       margin: 0.1rem 0 !important;
+     }
+     .insight { font-size: 1rem !important; margin: 0.1rem 0 !important; }
+     .insight li {
+       font-size: 1rem !important;
+       margin: 0.05rem 0 !important;
+       padding-left: 0.2rem !important;
+     }
+     .insight li::before { font-size: 1rem !important; }
+     .message { font-size: 1rem !important; margin-top: 0.1rem !important; }
+     .cases { margin: 0.1rem 0 !important; }
+     .cases li { font-size: 1rem !important; margin: 0.05rem 0 !important; }
+     .primary-link {
+       font-size: 1rem !important;
+       padding: 0.1rem 0.2rem !important;
+       border-radius: 0.2rem !important;
+     }
+   }
