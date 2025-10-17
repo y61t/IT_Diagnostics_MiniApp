@@ -1,187 +1,146 @@
 html {
-     font-size: 16px;
-   }
+  font-size: 16px;
+}
 
-   body {
-     font-family: "Inter", Arial, sans-serif;
-     background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
-     color: #1e1e2d;
-     margin: 0;
-     font-size: 1.25rem;
-     min-height: 100vh;
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     line-height: 1.2;
-   }
+body {
+  font-family: "Inter", Arial, sans-serif;
+  background: linear-gradient(135deg, #f4f7fb, #e6ebf2);
+  color: #1e1e2d;
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  line-height: 1.2;
+}
 
-   .container {
-     background: #fff;
-     padding: 0.5rem;
-     border-radius: 0.5rem;
-     box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
-     width: 100%;
-     box-sizing: border-box;
-     overflow: auto !important;
-   }
+.container {
+  background: #fff;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 0.25rem 1rem rgba(0, 0, 0, 0.1);
+  width: 100%;
+  box-sizing: border-box;
+  overflow: auto;
+}
 
-   .hidden { display: none; }
+.hidden { display: none; }
 
-   h1 {
-     font-size: 1.75rem;
-     margin-bottom: 0.5rem;
-     color: #2d3e50;
-   }
+h1, h2 {
+  color: #2d3e50;
+  margin-bottom: 0.5rem;
+}
 
-   h2 {
-     font-size: 1.5rem;
-     margin-bottom: 0.5rem;
-     color: #2d3e50;
-   }
+.subtitle {
+  color: #555;
+  margin-bottom: 0.5rem;
+}
 
-   .subtitle {
-     color: #555;
-     font-size: 1rem;
-     margin-bottom: 0.5rem;
-   }
+#scenario-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
 
-   #scenario-buttons {
-     display: flex;
-     flex-direction: column;
-     gap: 0.5rem;
-   }
+button {
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
 
-   button {
-     border: none;
-     border-radius: 0.5rem;
-     padding: 0.5rem 1rem;
-     font-size: 1rem;
-     cursor: pointer;
-     font-weight: 600;
-   }
+button.primary {
+  background: #4361ee;
+  color: #fff;
+}
 
-   button.primary {
-     background: #4361ee;
-     color: #fff;
-   }
+#scenario-buttons button {
+  background: #f2f4f8;
+  color: #222;
+}
 
-   #scenario-buttons button {
-     background: #f2f4f8;
-     color: #222;
-   }
+input {
+  width: 100%;
+  margin: 0.5rem 0;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 2px solid #d0d4dc;
+  box-sizing: border-box;
+}
 
-   input {
-     width: 100%;
-     margin: 0.5rem 0;
-     padding: 0.5rem;
-     border-radius: 0.5rem;
-     border: 2px solid #d0d4dc;
-     font-size: 1rem;
-     box-sizing: border-box;
-   }
+input:focus {
+  border-color: #4361ee;
+  outline: none;
+}
 
-   input:focus {
-     border-color: #4361ee;
-     outline: none;
-   }
+input.error {
+  border-color: #e74c3c;
+}
 
-   input.error {
-     border-color: #e74c3c;
-   }
+.insight {
+  margin: 0.5rem 0;
+  color: #333;
+  text-align: left;
+}
 
-   .insight {
-     font-size: 1rem;
-     margin: 0.5rem 0;
-     color: #333;
-     text-align: left;
-   }
+.insight ul {
+  list-style: none;
+  padding: 0;
+}
 
-   .insight ul {
-     list-style: none;
-     padding: 0;
-   }
+.insight li {
+  margin: 0.25rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
 
-   .insight li {
-     margin: 0.25rem 0;
-     padding-left: 1rem;
-     position: relative;
-   }
+.insight li::before {
+  content: "•";
+  color: #4361ee;
+  position: absolute;
+  left: 0;
+}
 
-   .insight li::before {
-     content: "•";
-     color: #4361ee;
-     position: absolute;
-     left: 0;
-     font-size: 1rem;
-   }
+.message {
+  margin-top: 0.5rem;
+  font-weight: 600;
+  display: none;
+}
 
-   .message {
-     margin-top: 0.5rem;
-     font-weight: 600;
-     display: none;
-   }
+.message.error { color: #e74c3c; }
+.message.success { color: #28a745; }
 
-   .message.error { color: #e74c3c; }
-   .message.success { color: #28a745; }
+.cases {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+}
 
-   .cases {
-     list-style: none;
-     padding: 0;
-     margin: 0.5rem 0;
-   }
+.cases li {
+  margin: 0.25rem 0;
+  color: #333;
+}
 
-   .cases li {
-     margin: 0.25rem 0;
-     font-size: 1rem;
-     color: #333;
-   }
+.primary-link {
+  background: #4361ee;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  display: inline-block;
+}
 
-   .primary-link {
-     background: #4361ee;
-     color: #fff;
-     text-decoration: none;
-     padding: 0.5rem 1rem;
-     border-radius: 0.5rem;
-     font-weight: 600;
-     font-size: 1rem;
-     display: inline-block;
-   }
-
-   @media (max-width: 768px) {
-     html { font-size: 200px !important; } /* Базовый огромный размер, одна буква ~200px+ */
-     body { font-size: 1rem !important; line-height: 1 !important; } /* Текст доминирует */
-     .container {
-       padding: 0.1rem !important; /* Минимальные отступы */
-       width: 100% !important;
-       overflow: auto !important;
-     }
-     h1 { font-size: 2rem !important; margin-bottom: 0.1rem !important; } /* ~400px */
-     h2 { font-size: 1.5rem !important; margin-bottom: 0.1rem !important; } /* ~300px */
-     .subtitle { font-size: 1rem !important; margin-bottom: 0.1rem !important; } /* ~200px */
-     button {
-       font-size: 1rem !important;
-       padding: 0.1rem 0.2rem !important;
-       border-radius: 0.2rem !important;
-     }
-     input {
-       font-size: 1rem !important;
-       padding: 0.1rem !important;
-       border-radius: 0.2rem !important;
-       margin: 0.1rem 0 !important;
-     }
-     .insight { font-size: 1rem !important; margin: 0.1rem 0 !important; }
-     .insight li {
-       font-size: 1rem !important;
-       margin: 0.05rem 0 !important;
-       padding-left: 0.2rem !important;
-     }
-     .insight li::before { font-size: 1rem !important; }
-     .message { font-size: 1rem !important; margin-top: 0.1rem !important; }
-     .cases { margin: 0.1rem 0 !important; }
-     .cases li { font-size: 1rem !important; margin: 0.05rem 0 !important; }
-     .primary-link {
-       font-size: 1rem !important;
-       padding: 0.1rem 0.2rem !important;
-       border-radius: 0.2rem !important;
-     }
-   }
+@media (max-width: 768px) {
+  html { font-size: 300px !important; }
+  body { line-height: 1 !important; }
+  .container { padding: 0.1rem !important; overflow: auto !important; }
+  h1 { font-size: 1.2rem !important; }
+  h2 { font-size: 1rem !important; }
+  .subtitle { font-size: 0.8rem !important; }
+  button { font-size: 0.8rem !important; padding: 0.1rem 0.2rem !important; }
+  input { font-size: 0.8rem !important; padding: 0.1rem !important; margin: 0.1rem 0 !important; }
+  .insight, .insight li, .cases li, .primary-link, .message { font-size: 0.8rem !important; margin: 0.1rem 0 !important; }
+  .insight li { padding-left: 0.2rem !important; }
+}
