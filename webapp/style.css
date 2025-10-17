@@ -1,3 +1,4 @@
+/* === Глобальные стили === */
 html {
   font-size: 16px;
 }
@@ -14,6 +15,7 @@ body {
   align-items: center;
 }
 
+/* === Контейнер === */
 .container {
   background: #fff;
   padding: 2rem;
@@ -24,26 +26,224 @@ body {
   box-sizing: border-box;
 }
 
-/* 📱 Правильное увеличение для Telegram WebApp и телефонов */
+.hidden {
+  display: none;
+}
+
+/* === Заголовки === */
+h1 {
+  font-size: 1.75rem;
+  margin-bottom: 1rem;
+  color: #2d3e50;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #2d3e50;
+}
+
+.subtitle {
+  color: #555;
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+
+/* === Кнопки === */
+#scenario-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+button {
+  border: none;
+  border-radius: 0.75rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 600;
+}
+
+button:hover {
+  transform: translateY(-0.125rem);
+}
+
+button.primary {
+  background: #4361ee;
+  color: #fff;
+}
+
+button.primary:hover {
+  background: #3651d6;
+}
+
+#scenario-buttons button {
+  background: #f2f4f8;
+  color: #222;
+}
+
+#scenario-buttons button:hover {
+  background: #e2e6ee;
+}
+
+/* === Поля ввода === */
+input {
+  width: 100%;
+  margin: 0.75rem 0;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid #d0d4dc;
+  font-size: 1rem;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+input:focus {
+  border-color: #4361ee;
+  outline: none;
+}
+
+input.error {
+  border-color: #e74c3c;
+}
+
+/* === Текст и сообщения === */
+.insight {
+  font-size: 1rem;
+  margin: 1rem 0;
+  color: #333;
+  text-align: left;
+}
+
+.insight ul {
+  list-style: none;
+  padding: 0;
+}
+
+.insight li {
+  margin: 0.5rem 0;
+  padding-left: 1rem;
+  position: relative;
+}
+
+.insight li::before {
+  content: "•";
+  color: #4361ee;
+  position: absolute;
+  left: 0;
+  font-size: 1rem;
+}
+
+.message {
+  margin-top: 1rem;
+  font-weight: 600;
+  display: none;
+}
+
+.message.error {
+  color: #e74c3c;
+}
+
+.message.success {
+  color: #28a745;
+}
+
+.cases {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0;
+}
+
+.cases li {
+  margin: 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+/* === Ссылки === */
+.primary-link {
+  background: #4361ee;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+
+.primary-link:hover {
+  background: #3651d6;
+}
+
+/* === Мобильная адаптация (для Telegram WebApp и телефонов) === */
 @media (pointer: coarse), (max-width: 900px) {
   html {
-    font-size: 24px; /* было 16 — увеличиваем */
+    font-size: 24px;
   }
+
   body {
     font-size: 1.5rem;
   }
+
   .container {
     padding: 3rem;
     border-radius: 1.5rem;
+    width: 95%;
+    max-width: none;
   }
+
   h1 {
     font-size: 2.5rem;
+    margin-bottom: 1.5rem;
   }
+
   h2 {
     font-size: 2rem;
+    margin-bottom: 1rem;
   }
-  button, input, .primary-link {
+
+  .subtitle {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  button,
+  input,
+  .primary-link {
     font-size: 1.5rem;
     padding: 1.25rem 1.75rem;
+    border-radius: 1.25rem;
+  }
+
+  .insight {
+    font-size: 1.5rem;
+    margin: 1.5rem 0;
+  }
+
+  .insight li {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+    padding-left: 2rem;
+  }
+
+  .insight li::before {
+    font-size: 1.5rem;
+  }
+
+  .message {
+    font-size: 1.5rem;
+    margin-top: 1.5rem;
+  }
+
+  .cases {
+    margin: 1.25rem 0;
+  }
+
+  .cases li {
+    font-size: 1.5rem;
+    margin: 1rem 0;
   }
 }
