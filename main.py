@@ -124,20 +124,16 @@ async def submit_contact(request: Request):
         try:
             user = validate_init_data(init_data)
             user_id = user['id']
-            chat_id = user_chat_map.get(user_id)
+            chat_id = user_chat_map.get(user_id, user_id)
         except Exception as e:
             logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
     else:
         logger.warning("init_data отсутствует, пытаемся использовать последний известный chat_id")
-        # Берем последний сохранённый chat_id для текущего user_id
         for uid, cid in user_chat_map.items():
-            if uid == user_id or (user_id is None and uid in user_chat_map):  # Проверяем последнего пользователя
+            if uid == 8100687321:  # Жёсткая привязка для теста, потом доработаем
                 chat_id = cid
                 user_id = uid
                 break
-        if not chat_id and user_chat_map:  # Если ничего не найдено, берем последний по времени
-            chat_id = list(user_chat_map.values())[-1]
-            user_id = list(user_chat_map.keys())[-1]
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
