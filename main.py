@@ -7,7 +7,6 @@ import hmac
 import hashlib
 import urllib.parse
 import json
-from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
@@ -25,6 +24,9 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Словарь для хранения chat_id по user_id
+user_chat_map = {}
+
 # Загружаем .env
 load_dotenv()
 
@@ -38,31 +40,8 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
 
-# === Telegram Bot ===
-default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
-bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)
-
-@dp.message(Command("start"))
-async def start(message: Message):
-    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
-    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
-    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
-    logger.info(f"Команда /start от user_id {message.from_user.id}")
-
-# === Lifespan ===
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    webhook_url = f"{RAILWAY_URL}/webhook"
-    await bot.delete_webhook(drop_pending_updates=True)
-    await bot.set_webhook(url=webhook_url)
-    logger.info(f"✅ Webhook установлен на {webhook_url}")
-    yield
-    await bot.session.close()
-    logger.info("✅ Bot session closed.")
-
 # === FastAPI ===
-app = FastAPI(lifespan=lifespan)
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -139,16 +118,22 @@ async def submit_contact(request: Request):
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
 
-    if not init_data:
-        logger.error("❌ init_data отсутствует. Отправка в Telegram невозможна.")
-        return JSONResponse({"status": "error", "message": "Ошибка: приложение должно запускаться из Telegram."}, status_code=400)
-
-    try:
-        user = validate_init_data(init_data)
-        chat_id = user['id']  # В личных чатах chat_id == user_id
-    except Exception as e:
-        logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
-        return JSONResponse({"status": "error", "message": "Ошибка аутентификации Telegram."}, status_code=400)
+    user_id = None
+    chat_id = None
+    if init_data:
+        try:
+            user = validate_init_data(init_data)
+            user_id = user['id']
+            chat_id = user_chat_map.get(user_id, user_id)
+        except Exception as e:
+            logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
+    else:
+        logger.warning("init_data отсутствует, пытаемся использовать последний известный chat_id")
+        for uid, cid in user_chat_map.items():
+            if uid == 8100687321:  # Жёсткая привязка для теста, потом доработаем
+                chat_id = cid
+                user_id = uid
+                break
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -160,35 +145,38 @@ async def submit_contact(request: Request):
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
         # Отправка фото main + фото сценария в Telegram
-        try:
-            main_photo_path = "webapp/images/main.png"
-            scenario_photo_path = f"webapp/images/{scenario_id}.png"
+        if chat_id:
+            try:
+                main_photo_path = "webapp/images/main.png"
+                scenario_photo_path = f"webapp/images/{scenario_id}.png"
 
-            if os.path.exists(main_photo_path):
-                await bot.send_photo(
-                    chat_id=chat_id,
-                    photo=types.FSInputFile(main_photo_path)
-                )
-                logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
-            else:
-                logger.warning(f"⚠️ Фото main.png не найдено для chat_id={chat_id}")
+                if os.path.exists(main_photo_path):
+                    await bot.send_photo(
+                        chat_id=chat_id,
+                        photo=types.FSInputFile(main_photo_path)
+                    )
+                    logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
+                else:
+                    logger.warning(f"⚠️ Фото main.png не найдено для chat_id={chat_id}")
 
-            if os.path.exists(scenario_photo_path):
-                await bot.send_photo(
-                    chat_id=chat_id,
-                    photo=types.FSInputFile(scenario_photo_path),
-                    caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
-                )
-                logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
-            else:
-                logger.warning(f"⚠️ Фото {scenario_id}.png не найдено для chat_id={chat_id}")
+                if os.path.exists(scenario_photo_path):
+                    await bot.send_photo(
+                        chat_id=chat_id,
+                        photo=types.FSInputFile(scenario_photo_path),
+                        caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
+                    )
+                    logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
+                else:
+                    logger.warning(f"⚠️ Фото {scenario_id}.png не найдено для chat_id={chat_id}")
 
-        except TelegramForbiddenError:
-            logger.error(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {chat_id}")
-        except TelegramBadRequest as e:
-            logger.error(f"❌ Ошибка Telegram: {str(e)}")
-        except Exception as e:
-            logger.error(f"❌ Неизвестная ошибка при отправке: {str(e)}")
+            except TelegramForbiddenError:
+                logger.error(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {chat_id}")
+            except TelegramBadRequest as e:
+                logger.error(f"❌ Ошибка Telegram: {str(e)}")
+            except Exception as e:
+                logger.error(f"❌ Неизвестная ошибка при отправке: {str(e)}")
+        else:
+            logger.warning("⚠️ Нет chat_id, сообщение не отправлено в TG.")
 
         return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
@@ -196,14 +184,40 @@ async def submit_contact(request: Request):
         logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
+# === Telegram Bot через Webhook ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher(bot=bot)
+
+@dp.message(Command("start"))
+async def start(message: Message):
+    button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
+    keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
+    await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    user_chat_map[message.from_user.id] = message.chat.id
+    logger.info(f"Сохранён chat_id {message.chat.id} для user_id {message.from_user.id}")
+
 # === Webhook для Telegram ===
 @app.post("/webhook")
 async def telegram_webhook(request: Request):
     body = await request.json()
+    if 'message' in body and 'from' in body['message'] and 'chat' in body['message']:
+        user_id = body['message']['from']['id']
+        chat_id = body['message']['chat']['id']
+        user_chat_map[user_id] = chat_id
+        logger.info(f"Обновлён chat_id {chat_id} для user_id {user_id}")
     logger.info(f"Получен webhook: {body}")
     update = types.Update(**body)
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
+
+# === Установка webhook при старте ===
+@app.on_event("startup")
+async def on_startup():
+    webhook_url = f"{RAILWAY_URL}/webhook"
+    await bot.delete_webhook(drop_pending_updates=True)
+    await bot.set_webhook(url=webhook_url)
+    logger.info(f"✅ Webhook установлен на {webhook_url}")
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
