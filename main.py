@@ -24,10 +24,10 @@ from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# Словарь для хранения chat_id по user_id
+# Важно: Создаем глобальный словарь для хранения user_id -> chat_id
 user_chat_map = {}
 
-# Загружаем .env
+# Загружаем переменные окружения
 load_dotenv()
 
 # === Настройки ===
@@ -51,6 +51,7 @@ app.add_middleware(
 
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$")
 
+
 # Валидация init_data от Telegram
 def validate_init_data(init_data_str: str) -> dict:
     params = dict(urllib.parse.parse_qsl(init_data_str))
@@ -63,21 +64,26 @@ def validate_init_data(init_data_str: str) -> dict:
         logger.info(f"✅ Успешная валидация init_data. User ID: {user['id']}")
         return user
     else:
-        logger.error(f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
+        logger.error(
+            f"❌ Ошибка валидации init_data. Received hash: {received_hash}, Calculated hash: {calculated_hash}")
         raise ValueError("Invalid init_data hash")
+
 
 # === Статика ===
 @app.get("/")
 def index():
     return FileResponse("webapp/index.html")
 
+
 @app.get("/style.css")
 def css():
     return FileResponse("webapp/style.css")
 
+
 @app.get("/script.js")
 def js():
     return FileResponse("webapp/script.js")
+
 
 # === Submit формы ===
 @app.post("/submit")
@@ -89,13 +95,16 @@ async def submit_contact(request: Request):
     scenario_id = str(data.get("scenario", "")).strip()
     init_data = data.get("init_data", "")
 
-    logger.info(f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
+    logger.info(
+        f"Получены данные: name={name}, email={email}, telegram={telegram}, scenario={scenario_id}, init_data={init_data}")
 
+    # Валидация
     if not name:
         return JSONResponse({"status": "error", "message": "Введите имя."}, status_code=400)
     if not email or not EMAIL_REGEX.match(email):
         return JSONResponse({"status": "error", "message": "Введите корректный email."}, status_code=400)
 
+    # Определяем scenario
     scenario_texts = {
         "1": "Проект в кризисе",
         "2": "Подготовка запуска ИТ-проекта",
@@ -106,6 +115,7 @@ async def submit_contact(request: Request):
     }
     scenario = scenario_texts.get(scenario_id, "Не указан сценарий")
 
+    # Создаем payload для CRM
     payload = {
         "fields": {
             "TITLE": f"Диагностика ИТ-рисков — {scenario}",
@@ -118,22 +128,27 @@ async def submit_contact(request: Request):
         "params": {"REGISTER_SONET_EVENT": "Y"}
     }
 
-    user_id = None
     chat_id = None
+    user_id = None
+
+    # Обработка init_data
     if init_data:
         try:
             user = validate_init_data(init_data)
             user_id = user['id']
-            chat_id = user_chat_map.get(user_id, user_id)
+            # сохраняем chat_id для этого user_id
+            chat_id = user_chat_map.get(user_id)
+            if not chat_id:
+                chat_id = user['id']  # обычно chat_id совпадает с user_id
+                user_chat_map[user_id] = chat_id
+            logger.info(f"Обновлен chat_id={chat_id} для user_id={user_id}")
         except Exception as e:
             logger.error(f"⚠️ Ошибка валидации init_data: {str(e)}")
     else:
-        logger.warning("init_data отсутствует, пытаемся использовать последний известный chat_id")
-        for uid, cid in user_chat_map.items():
-            if uid == 8100687321:  # Жёсткая привязка для теста, потом доработаем
-                chat_id = cid
-                user_id = uid
-                break
+        # Если init_data нет, можно попытаться взять chat_id из уже сохраненных
+        # (например, для теста)
+        # В реальности лучше дождаться init_data
+        logger.warning("init_data отсутствует, chat_id не обновлен.")
 
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
@@ -144,7 +159,7 @@ async def submit_contact(request: Request):
             logger.error(f"⚠️ Ошибка Bitrix: {result}")
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        # Отправка фото main + фото сценария в Telegram
+        # Отправка фото конкретному пользователю
         if chat_id:
             try:
                 main_photo_path = "webapp/images/main.png"
@@ -155,7 +170,6 @@ async def submit_contact(request: Request):
                         chat_id=chat_id,
                         photo=types.FSInputFile(main_photo_path)
                     )
-                    logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
                 else:
                     logger.warning(f"⚠️ Фото main.png не найдено для chat_id={chat_id}")
 
@@ -165,7 +179,6 @@ async def submit_contact(request: Request):
                         photo=types.FSInputFile(scenario_photo_path),
                         caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
                     )
-                    logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
                 else:
                     logger.warning(f"⚠️ Фото {scenario_id}.png не найдено для chat_id={chat_id}")
 
@@ -184,18 +197,22 @@ async def submit_contact(request: Request):
         logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
+
 # === Telegram Bot через Webhook ===
 default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
 bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
 dp = Dispatcher(bot=bot)
+
 
 @dp.message(Command("start"))
 async def start(message: Message):
     button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
     keyboard = ReplyKeyboardMarkup(keyboard=[[button]], resize_keyboard=True)
     await message.answer("Привет! 👋 Нажми кнопку ниже, чтобы пройти диагностику IT-рисков:", reply_markup=keyboard)
+    # сохраняем chat_id для этого пользователя
     user_chat_map[message.from_user.id] = message.chat.id
     logger.info(f"Сохранён chat_id {message.chat.id} для user_id {message.from_user.id}")
+
 
 # === Webhook для Telegram ===
 @app.post("/webhook")
@@ -204,12 +221,14 @@ async def telegram_webhook(request: Request):
     if 'message' in body and 'from' in body['message'] and 'chat' in body['message']:
         user_id = body['message']['from']['id']
         chat_id = body['message']['chat']['id']
+        # сохраняем chat_id по user_id
         user_chat_map[user_id] = chat_id
         logger.info(f"Обновлён chat_id {chat_id} для user_id {user_id}")
     logger.info(f"Получен webhook: {body}")
     update = types.Update(**body)
     await dp.feed_update(bot, update)
     return JSONResponse({"ok": True})
+
 
 # === Установка webhook при старте ===
 @app.on_event("startup")
@@ -218,6 +237,7 @@ async def on_startup():
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Webhook установлен на {webhook_url}")
+
 
 # === Запуск FastAPI ===
 if __name__ == "__main__":
