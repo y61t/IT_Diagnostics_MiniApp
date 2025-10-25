@@ -8,15 +8,17 @@ import hashlib
 import urllib.parse
 import json
 
-from fastapi import FastAPI, Request, BackgroundTasks
+from fastapi import FastAPI, Request
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
+import uvicorn
 
 from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
-from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup
+from aiogram.types import WebAppInfo, KeyboardButton, ReplyKeyboardMarkup, Message
 from aiogram.enums import ParseMode
 from aiogram.client.bot import DefaultBotProperties
+from aiogram.exceptions import TelegramBadRequest, TelegramForbiddenError
 
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
@@ -37,11 +39,6 @@ for var in REQUIRED_ENVS:
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 RAILWAY_URL = os.getenv("RAILWAY_URL")
 BITRIX_WEBHOOK_URL = os.getenv("BITRIX_WEBHOOK_URL")
-
-# === Инициализация бота и диспетчера ===
-default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
-bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
-dp = Dispatcher(bot=bot)
 
 # === FastAPI ===
 app = FastAPI()
@@ -84,7 +81,7 @@ def js():
 
 # === Submit формы ===
 @app.post("/submit")
-async def submit_contact(request: Request, background_tasks: BackgroundTasks):
+async def submit_contact(request: Request):
     data = await request.json()
     name = data.get("name", "").strip()
     email = data.get("email", "").strip()
@@ -147,9 +144,39 @@ async def submit_contact(request: Request, background_tasks: BackgroundTasks):
             logger.error(f"⚠️ Ошибка Bitrix: {result}")
             return JSONResponse({"status": "error", "message": "Не удалось создать лид."}, status_code=400)
 
-        # Отправка фото в Telegram как фоновую задачу
+        # Отправка фото main + фото сценария в Telegram
         if chat_id:
-            background_tasks.add_task(send_telegram_photos, chat_id, scenario_id)
+            try:
+                main_photo_path = "webapp/images/main.png"
+                scenario_photo_path = f"webapp/images/{scenario_id}.png"
+
+                if os.path.exists(main_photo_path):
+                    await bot.send_photo(
+                        chat_id=chat_id,
+                        photo=types.FSInputFile(main_photo_path)
+                    )
+                    logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
+                else:
+                    logger.warning(f"⚠️ Фото main.png не найдено для chat_id={chat_id}")
+
+                if os.path.exists(scenario_photo_path):
+                    await bot.send_photo(
+                        chat_id=chat_id,
+                        photo=types.FSInputFile(scenario_photo_path),
+                        caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
+                    )
+                    logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
+                else:
+                    logger.warning(f"⚠️ Фото {scenario_id}.png не найдено для chat_id={chat_id}")
+
+            except TelegramForbiddenError:
+                logger.error(f"❌ Ошибка: Бот заблокирован или нет доступа к чату {chat_id}")
+            except TelegramBadRequest as e:
+                logger.error(f"❌ Ошибка Telegram: {str(e)}")
+            except Exception as e:
+                logger.error(f"❌ Неизвестная ошибка при отправке: {str(e)}")
+        else:
+            logger.warning("⚠️ Нет chat_id, сообщение не отправлено в TG.")
 
         return JSONResponse({"status": "ok", "lead_id": result.get("result")})
 
@@ -157,32 +184,11 @@ async def submit_contact(request: Request, background_tasks: BackgroundTasks):
         logger.error(f"⚠️ Ошибка: {str(e)}")
         return JSONResponse({"status": "error", "message": "Ошибка соединения с CRM."}, status_code=500)
 
-# Функция для отправки фото в Telegram
-async def send_telegram_photos(chat_id: int, scenario_id: str):
-    try:
-        main_photo_path = "webapp/images/main.png"
-        scenario_photo_path = f"webapp/images/{scenario_id}.png"
-
-        if os.path.exists(main_photo_path):
-            await bot.send_photo(chat_id=chat_id, photo=types.FSInputFile(main_photo_path))
-            logger.info(f"✅ Основное фото отправлено в Telegram для chat_id={chat_id}")
-        else:
-            logger.warning(f"⚠️ Фото main.png не найдено для chat_id={chat_id}")
-
-        if os.path.exists(scenario_photo_path):
-            await bot.send_photo(
-                chat_id=chat_id,
-                photo=types.FSInputFile(scenario_photo_path),
-                caption=f"Вот общие материалы🔥 Наш архитектор свяжется✍️"
-            )
-            logger.info(f"✅ Фото сценария отправлено в Telegram для chat_id={chat_id}")
-        else:
-            logger.warning(f"⚠️ Фото {scenario_id}.png не найдено для chat_id={chat_id}")
-
-    except Exception as e:
-        logger.error(f"❌ Ошибка при отправке фото в Telegram: {str(e)}")
-
 # === Telegram Bot через Webhook ===
+default_properties = DefaultBotProperties(parse_mode=ParseMode.HTML)
+bot = Bot(token=TELEGRAM_TOKEN, default=default_properties)
+dp = Dispatcher(bot=bot)
+
 @dp.message(Command("start"))
 async def start(message: Message):
     button = KeyboardButton(text="🚀 Открыть диагностику IT-рисков", web_app=WebAppInfo(url=RAILWAY_URL))
@@ -213,7 +219,7 @@ async def on_startup():
     await bot.set_webhook(url=webhook_url)
     logger.info(f"✅ Webhook установлен на {webhook_url}")
 
-# Уберите этот блок, так как Timeweb запускает через Procfile
-# if __name__ == "__main__":
-#     port = int(os.getenv("PORT", 8000))
-#     uvicorn.run(app, host="0.0.0.0", port=port)
+# === Запуск FastAPI ===
+if __name__ == "__main__":
+    port = int(os.getenv("PORT", 8080))
+    uvicorn.run(app, host="0.0.0.0", port=port)
